@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "commit": {
+    "scopes": [
+      {
+        "name": "intent",
+        "area": "Stage 1: the intent of a change, and the skills, templates, and hooks of this stage",
+        "paths": []
+      },
+      {
+        "name": "design",
+        "area": "Stage 2: the design of a change, and the skills, templates, and hooks of this stage",
+        "paths": []
+      },
+      {
+        "name": "build",
+        "area": "Stage 3: plans and implementation, including the plan skill and its approval gate",
+        "paths": []
+      },
+      {
+        "name": "verify",
+        "area": "Stage 4: tests, builds, visual checks, and evals",
+        "paths": []
+      },
+      {
+        "name": "deploy",
+        "area": "Stage 5: deployment",
+        "paths": []
+      },
+      {
+        "name": "maintain",
+        "area": "Stage 6: maintenance after deployment",
+        "paths": []
+      },
+      {
+        "name": "conventions",
+        "area": "Conventions that the plugin ships and that every stage uses",
+        "paths": [
+          "docs/conventions/**"
+        ]
+      },
+      {
+        "name": "plugin",
+        "area": "The plugin manifest, the marketplace entry, and code that all stages share",
+        "paths": [
+          ".claude-plugin/**"
+        ]
+      },
+      {
+        "name": "evals",
+        "area": "Sample projects and the eval runner that test the plugin in other stacks",
+        "paths": [
+          "evals/**"
+        ]
+      },
+      {
+        "name": "deps",
+        "area": "Third-party skills that this repository bundles, and their records",
+        "paths": [
+          "skills/THIRD_PARTY.md",
+          "skills/humanizer/**",
+          "skills/simple-english/**"
+        ]
+      },
+      {
+        "name": "agents",
+        "area": "Agent instructions and agent configuration of this repository",
+        "paths": [
+          "AGENTS.md",
+          "CLAUDE.md",
+          ".claude/**",
+          ".ai-dlc/config.json"
+        ]
+      }
+    ]
+  }
+}
