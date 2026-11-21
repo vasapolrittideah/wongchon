@@ -70,6 +70,7 @@ The groups below follow the order of the work.
 | --- | --- |
 | Writing or updating English prose, including code comments, commit messages, and the text of skills | [English prose](docs/conventions/english-prose.md) |
 | Writing or updating Markdown files or the text of pull requests and Issues | [Markdown](docs/conventions/markdown.md) |
+| Writing or updating code comments, docstrings, and doc comments | [Code comments](docs/conventions/code-comments.md) |
 | Writing or updating convention files in `docs/conventions/` | [Convention files](docs/conventions/convention-files.md) |
 
 ### Stages

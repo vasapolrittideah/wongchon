@@ -1,6 +1,6 @@
 # English prose conventions
 
-This convention defines how to write English prose in the text that this project writes. It covers Markdown files, code comments in every language, commit messages, pull request and Issue text, and the skills, agents, and templates of this project. It excludes third-party files that the project copies with no changes, generated files, string values in code and configuration, and replies in chat. The [Markdown](markdown.md) conventions cover the format of Markdown text.
+This convention defines how to write English prose in the text that this project writes. It covers Markdown files, code comments in every language, commit messages, pull request and Issue text, and the skills, agents, and templates of this project. It excludes third-party files that the project copies with no changes, generated files, string values in code and configuration, and replies in chat. The [Markdown](markdown.md) conventions cover the format of Markdown text. The [Code comments](code-comments.md) conventions cover when code has a comment.
 
 ## Rules
 
