@@ -1,22 +1,4 @@
 #!/usr/bin/env python3
-"""Block the Git and GitHub CLI commands that only the maintainer runs.
-
-An agent runs this script as a hook before each shell command. The script
-reads the hook input as JSON on standard input. If the command must not run,
-the script writes the reason to standard error and exits with code 2, which
-blocks the command. The script blocks each command that:
-
-- merges a pull request, enables auto-merge, or adds a pull request to a
-  merge queue.
-- changes branch protection, rulesets, refs, or repository settings on GitHub.
-- commits on main, pushes to main, or deletes main.
-- force-pushes, or pushes all branches.
-- skips the Git hooks with --no-verify.
-
-The agent uses the GitHub token of the maintainer, so GitHub cannot tell the
-agent from the maintainer. This script finds mistakes. It does not stop an
-agent that bypasses it on purpose, such as with a script file or an alias.
-"""
 import fnmatch
 import json
 import os
@@ -25,11 +7,9 @@ import shlex
 import subprocess
 import sys
 
-# shortcut: a fixed name, read it from .wongchon/config.json when a project uses another default branch
 PROTECTED_BRANCH = "main"
 
 OPERATORS = "();<>|&`\n"
-# These words run the command that follows them, so the script looks past them for git or gh.
 WRAPPERS = {"env", "command", "builtin", "exec", "nohup", "time", "nice", "timeout", "sudo", "xargs",
             "!", "{", "if", "then", "else", "elif", "do", "while", "until"}
 SHELLS = {"sh", "bash", "zsh", "dash", "ksh"}
@@ -46,7 +26,6 @@ API_LONG_VALUES = {"--method", "--header", "--field", "--raw-field", "--input", 
                    "--hostname", "--preview", "--cache"}
 REPO_WRITES = {"edit", "rename", "archive", "unarchive", "delete"}
 RULESET_READS = {"list", "ls", "view", "check"}
-# A `gh api` call can write to a repository only under these paths.
 REPO_WRITE_PATHS = {"issues", "pulls", "labels", "milestones"}
 GRAPHQL_MERGES = re.compile(r"\b(mergePullRequest|mergeBranch|enablePullRequestAutoMerge|enqueuePullRequest)\b")
 GRAPHQL_SETTINGS = re.compile(
@@ -68,7 +47,6 @@ PUSH_ALL = "Name the branch to push. --all, --branches, and --prune can push to 
 
 
 def strip_heredocs(text):
-    """Remove the bodies of here-documents, because they hold data and not commands."""
     rows, ends = [], []
     for row in text.split("\n"):
         if ends:
@@ -81,18 +59,12 @@ def strip_heredocs(text):
 
 
 def split_commands(text):
-    """Return each simple command in a shell line as a list of words without quotes.
-
-    The list includes the commands in subshells, command substitutions,
-    `sh -c` scripts, and `eval` arguments.
-    """
     lexer = shlex.shlex(strip_heredocs(text), posix=True, punctuation_chars=OPERATORS)
     lexer.whitespace = " \t\r"
     lexer.whitespace_split = True
     lexer.commenters = ""
     commands, words = [], []
     for token in list(lexer) + [";"]:
-        # shortcut: a quoted operator, such as "&&", also ends a command, which only blocks more
         if set(token) <= set(OPERATORS):
             if words:
                 commands.append(words)
@@ -114,12 +86,6 @@ def split_commands(text):
 
 
 def parse(args, short_values="", long_values=(), short_optional=""):
-    """Split command arguments into options and positional words.
-
-    Return (options, positionals). Each option is a (name, value) pair, and
-    each letter of a short option cluster, such as -fu, is its own option.
-    short_optional lists the letters that take a value only in the same word.
-    """
     options, positionals, i = [], [], 0
     while i < len(args):
         arg = args[i]
@@ -128,7 +94,6 @@ def parse(args, short_values="", long_values=(), short_optional=""):
             break
         if arg.startswith("--"):
             name, equals, value = arg.partition("=")
-            # shortcut: an abbreviated value option, such as --mess, does not skip its value
             if not equals and name in long_values and i + 1 < len(args):
                 i += 1
                 value = args[i]
@@ -152,12 +117,10 @@ def parse(args, short_values="", long_values=(), short_optional=""):
 
 
 def is_option(name, full):
-    """Return whether name is full or an abbreviation of it, because Git accepts abbreviated options."""
     return len(name) > 2 and full.startswith(name)
 
 
 def run_git(args, cwd):
-    """Return the output of a git command, or None when it fails."""
     try:
         result = subprocess.run(["git"] + args, cwd=cwd, capture_output=True, text=True, timeout=10)
     except (OSError, subprocess.SubprocessError):
@@ -260,7 +223,6 @@ def check_api(args, cwd, line):
     writes = method not in ("GET", "HEAD")
     if parts[0] == "repos" and len(parts) >= 3:
         rest = parts[3:]
-        # Block each method, because a merge endpoint has no read that the agent needs.
         if rest[:1] == ["merges"] or (rest[:1] == ["pulls"] and rest[2:3] == ["merge"]):
             return MERGE
         if writes and (not rest or rest[0] not in REPO_WRITE_PATHS):
@@ -284,7 +246,6 @@ def check_gh(args, cwd, line):
 
 
 def decide(line, cwd, git=run_git):
-    """Return the reason to block a shell line, or None to allow it."""
     for words in split_commands(line):
         while words and ASSIGNMENT.match(words[0]):
             words = words[1:]
@@ -295,7 +256,6 @@ def decide(line, cwd, git=run_git):
             continue
         name = os.path.basename(words[0])
         if name == "cd":
-            # shortcut: a cd in a subshell also applies to later commands, which can only block more
             cwd = os.path.join(cwd, os.path.expanduser(words[1] if len(words) > 1 else "~"))
         elif name == "git":
             reason = check_git(words[1:], cwd, git)
@@ -313,7 +273,7 @@ def main():
         data = json.load(sys.stdin)
         command = (data.get("tool_input") or {}).get("command") or ""
         reason = decide(command, data.get("cwd") or os.getcwd())
-    except Exception as error:  # Fail closed: a command that the guard cannot check does not run.
+    except Exception as error:
         reason = "This hook cannot check the command ({0}). Simplify the command.".format(error)
     if reason:
         print("git-guard blocked this command. " + reason, file=sys.stderr)

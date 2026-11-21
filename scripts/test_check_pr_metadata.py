@@ -1,4 +1,3 @@
-"""Tests for check_pr_metadata.py. Run them with: python3 -m unittest discover -s scripts"""
 import json
 import os
 import subprocess
@@ -188,6 +187,17 @@ class Script(unittest.TestCase):
     def test_missing_title_or_body_exits_2(self):
         self.assertEqual(self.run_script(None).returncode, 2)
         self.assertEqual(self.run_script("feat: add a check", None).returncode, 2)
+
+    def test_body_comes_only_from_pr_body(self):
+        with tempfile.NamedTemporaryFile("w", suffix=".json") as event:
+            json.dump({"pull_request": {"body": GOOD_BODY}}, event)
+            event.flush()
+            os.environ["GITHUB_EVENT_PATH"] = event.name
+            try:
+                result = self.run_script("feat: add a check", None)
+            finally:
+                del os.environ["GITHUB_EVENT_PATH"]
+        self.assertEqual(result.returncode, 2)
 
 
 if __name__ == "__main__":

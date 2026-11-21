@@ -1,31 +1,4 @@
 #!/usr/bin/env python3
-"""Check the title and the description headings of a pull request against the conventions.
-
-Run this script from the root of the project. It reads the title from the PR_TITLE
-environment variable and the description from the PR_BODY environment variable, so that
-a CI workflow never puts them inside a shell script. It reads its rules from the
-conventions next to this script and from .wongchon/config.json of the project.
-
-The script checks the title against the subject rules of
-docs/conventions/commit-messages.md:
-
-- the form <type>(<scope>)!: <description>, with an optional scope and breaking marker.
-- a type from the Types table, and a scope name from commit.scopes.
-- a description that starts with a lowercase letter, does not end with a period, and
-  has no backticks, Markdown links, or URLs.
-- a subject line of at most 72 characters.
-
-It also checks that the level 2 headings of the description are the headings of the
-Template section of docs/conventions/pull-requests.md, in the same order, and that the
-description has no HTML comments, because the conventions ask you to delete the comments
-of the template. Lines in code blocks and text in inline code do not count.
-
-A script cannot tell if a description uses the imperative mood or names a specific
-change, so the maintainer checks these rules in review.
-
-If the pull request breaks a rule, the script writes each finding to standard error
-and exits with code 1.
-"""
 import json
 import os
 import re
@@ -44,7 +17,6 @@ INLINE_CODE = re.compile(r"`[^`]*`")
 
 
 def load_types(path=COMMIT_CONVENTION):
-    """Return the types in the Types table of the commit message conventions."""
     types = set()
     in_table = False
     with open(path, encoding="utf-8") as file:
@@ -61,7 +33,6 @@ def load_types(path=COMMIT_CONVENTION):
 
 
 def load_scopes(path=CONFIG):
-    """Return the scope names in commit.scopes. Without the file or the list, no scope is valid."""
     if not os.path.exists(path):
         return set()
     with open(path, encoding="utf-8") as file:
@@ -70,7 +41,6 @@ def load_scopes(path=CONFIG):
 
 
 def load_headings(path=PR_CONVENTION):
-    """Return the level 2 headings in the code block of the Template section of the PR conventions."""
     headings = []
     with open(path, encoding="utf-8") as file:
         lines = file.read().splitlines()
@@ -89,7 +59,6 @@ def load_headings(path=PR_CONVENTION):
 
 
 def prose_lines(body):
-    """Return the lines of a Markdown text outside code blocks, without inline code."""
     lines = []
     in_block = False
     for line in body.splitlines():
@@ -101,7 +70,6 @@ def prose_lines(body):
 
 
 def check_title(title, types, scopes):
-    """Return the findings for the title. An empty list means that the title follows the rules."""
     match = SUBJECT.match(title)
     if not match:
         return ['"{0}" does not have the form <type>(<scope>)!: <description>, '
@@ -127,7 +95,6 @@ def check_title(title, types, scopes):
 
 
 def check_body(body, expected):
-    """Return the findings for the headings and the HTML comments of the description."""
     lines = prose_lines(body)
     actual = [line[3:].strip() for line in lines if line.startswith("## ")]
     findings = []
@@ -144,7 +111,6 @@ def check_body(body, expected):
 
 def main():
     title = os.environ.get("PR_TITLE")
-    # shortcut: an environment variable holds at most 128 KiB on Linux, read GITHUB_EVENT_PATH if a body is larger
     body = os.environ.get("PR_BODY")
     if not title or body is None:
         print("Set PR_TITLE to the pull request title and PR_BODY to its description.", file=sys.stderr)

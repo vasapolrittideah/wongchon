@@ -1,4 +1,3 @@
-"""Tests for git_guard.py. Run them with: python3 -m unittest discover -s hooks"""
 import json
 import os
 import subprocess
@@ -13,7 +12,6 @@ SCRIPT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "git_guard.py"
 
 
 def fake_git(branch="feat/x", push_destination=None, calls=None):
-    """Return a git runner that answers the branch queries of the guard without a repository."""
     def run(args, cwd):
         if calls is not None:
             calls.append((args, cwd))
@@ -45,6 +43,7 @@ class BlockedCommands(unittest.TestCase):
             "gh api --method=PUT /repos/owner/repo/pulls/12/merge?x=1",
             "gh api https://api.github.com/repos/owner/repo/pulls/12/merge",
             "gh api repos/owner/repo/merges -f base=main -f head=feat/x",
+            "gh api repos/owner/repo/pulls/12/merge",
             "gh api graphql -f query='mutation { mergePullRequest(input: {pullRequestId: \"x\"}) { clientMutationId } }'",
             "gh api graphql -f query='mutation { enablePullRequestAutoMerge(input: {}) { clientMutationId } }'",
             "gh api graphql -f query='mutation { enqueuePullRequest(input: {}) { clientMutationId } }'",
@@ -243,6 +242,27 @@ class AllowedCommands(unittest.TestCase):
         result = run_hook({"tool_input": {"command": "gh pr merge 12"}, "cwd": "."})
         self.assertEqual(result.returncode, 2)
         self.assertIn("git-guard blocked this command", result.stderr)
+
+
+class KnownLimits(unittest.TestCase):
+    def test_only_main_is_protected(self):
+        git = fake_git(branch="master")
+        for command in ("git commit -m x", "git push", "git push origin master"):
+            with self.subTest(command=command):
+                self.assertIsNone(git_guard.decide(command, "/repo", git))
+
+    def test_quoted_operator_ends_a_command(self):
+        reason = git_guard.decide("echo '&&' git push --force origin feat/x", "/repo", fake_git())
+        self.assertIn("Do not force-push", reason)
+
+    def test_abbreviated_value_option_does_not_skip_its_value(self):
+        self.assertIsNone(git_guard.decide("git commit --message -n", "/repo", fake_git()))
+        self.assertIn("Do not skip the Git hooks", git_guard.decide("git commit --mess -n", "/repo", fake_git()))
+
+    def test_cd_in_a_subshell_applies_to_later_commands(self):
+        calls = []
+        git_guard.decide("(cd sub) && git commit -m x", "/repo", fake_git(calls=calls))
+        self.assertEqual(calls[0][1], "/repo/sub")
 
 
 def run_hook(data):

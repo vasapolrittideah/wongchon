@@ -3,7 +3,6 @@ name: CI
 on:
   pull_request:
     branches: [main]
-    # edited runs the metadata check again after a change to the title or the description.
     types: [opened, synchronize, reopened, edited]
 
 permissions:
@@ -12,7 +11,6 @@ permissions:
 jobs:
   checks:
     name: Checks (Python ${{ matrix.python }})
-    # shortcut: setup-python has no Python 3.9 for Ubuntu 26.04, move on when the minimum Python changes
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
@@ -46,7 +44,6 @@ jobs:
         with:
           persist-credentials: false
       - name: Check the PR title and description headings
-        # The title and the body go through env, not into the script, so they cannot inject shell code.
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
           PR_BODY: ${{ github.event.pull_request.body }}
