@@ -57,7 +57,7 @@ Status: <status value>
 ### Title
 
 - Write the title as `# Intent: <name of the change>`.
-- Write the name of the change as a short noun phrase, such as "wongchon version 1" or "email change".
+- Write the name of the change as a short noun phrase, such as "design documents and ADRs" or "email change".
 
 ### Author line
 
@@ -123,7 +123,12 @@ Status: <status value>
 
 ### Naming and location
 
-- Save each intent as `docs/intents/<change name>.md`. Write the change name as lowercase words and numbers separated by single hyphens, such as `wongchon-v1` or `email-change`.
+- Save each intent as `docs/intents/<change name>.md`.
+- Write the change name as `<scope>-<capability>`, in lowercase words and numbers separated by single hyphens, such as `design-docs-and-adrs` or `account-email-change`.
+- For the scope part, use the scope of the main change of the whole change, as the [Scope](commit-messages.md#scope) rules of the commit message conventions choose it. If those rules omit the scope, omit the scope part too.
+- For the capability part, name what the change delivers, such as `docs-and-adrs` or `email-change`.
+- Do not use a general word alone as the capability part, such as `stage` or `feature`.
+- Do not add the name of the project or a version, such as `wongchon-v1`. Each change belongs to the project, and a change can finish in a later version.
 
 ### Format and content
 
@@ -175,6 +180,22 @@ These criteria do not follow the convention. The first criterion breaks the Succ
 - Email changes are seamless.
 - The service sends the code with the Nodemailer library.
 ```
+
+### Change names
+
+These change names follow the convention. The first part is the scope of the main change, and the second part names what the change delivers:
+
+| Change | Change name |
+| --- | --- |
+| The design stage of a plugin, with design documents and ADRs, in the `design` scope | `design-docs-and-adrs` |
+| A change of the email address of an account, in the `account` scope | `account-email-change` |
+
+These change names do not follow the convention. The first name adds the name of the project and a version. The second name uses a general word as the capability part.
+
+| Change | Change name |
+| --- | --- |
+| The design stage of a plugin, with design documents and ADRs, in the `design` scope | `wongchon-v1-design-stage` |
+| The build stage of a plugin, in the `build` scope | `build-stage` |
 
 ### Answers
 
