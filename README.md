@@ -24,7 +24,7 @@ You cannot install the plugin yet. This repository holds its conventions and age
 | `AGENTS.md` | Instructions for agents that work in this repository. `CLAUDE.md` is a link to it. |
 | `ROADMAP.md` | The purpose, sources, decisions, and order of the work of this project |
 | `docs/conventions/` | Conventions for the artifacts that the plugin writes. The plugin ships these files. |
-| `skills/` | Third-party skills that the plugin bundles |
+| `skills/` | The skills of the plugin, such as `intent`, and the third-party skills that it bundles |
 | `hooks/` | Hook scripts. `git_guard.py` blocks the Git and GitHub CLI commands that only the maintainer runs. |
 | `.claude/settings.json` | Claude Code settings of this repository, which run the Git guard before each shell command |
 | `.wongchon/config.json` | Settings of this repository for the plugin, such as the commit scopes |
@@ -37,7 +37,7 @@ Follow the [repository instructions](AGENTS.md). The maintainer reviews and squa
 ## Credits
 
 - The [AI-native SDLC playbook](https://claude.com/resources/articles/the-ai-native-sdlc-playbook) from Anthropic is the source of the lifecycle and its stages.
-- The plugin will adapt some skills of [agent-skills](https://github.com/addyosmani/agent-skills) by Addy Osmani.
+- The plugin adapts some skills of [agent-skills](https://github.com/addyosmani/agent-skills) by Addy Osmani.
 - The bundled `simple-english` and `humanizer` skills come from other projects. [`skills/THIRD_PARTY.md`](skills/THIRD_PARTY.md) lists their sources, versions, and licenses.
 
 ## License
