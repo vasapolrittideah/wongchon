@@ -4,32 +4,32 @@
     "scopes": [
       {
         "name": "intent",
-        "area": "Stage 1: the intent of a change, and the skills, templates, and hooks of this stage",
+        "area": "Stage 1: the intent of a change, and the conventions, skills, templates, and hooks of this stage",
         "paths": []
       },
       {
         "name": "design",
-        "area": "Stage 2: the design of a change, and the skills, templates, and hooks of this stage",
+        "area": "Stage 2: the design of a change, and the conventions, skills, templates, and hooks of this stage",
         "paths": []
       },
       {
         "name": "build",
-        "area": "Stage 3: plans and implementation, including the plan skill and its approval gate",
+        "area": "Stage 3: plans and implementation, and the conventions, skills, and approval gate of this stage",
         "paths": []
       },
       {
         "name": "verify",
-        "area": "Stage 4: tests, builds, visual checks, and evals",
+        "area": "Stage 4: tests, builds, visual checks, evals, and the conventions of this stage",
         "paths": []
       },
       {
         "name": "deploy",
-        "area": "Stage 5: deployment",
+        "area": "Stage 5: deployment, and the conventions of this stage",
         "paths": []
       },
       {
         "name": "maintain",
-        "area": "Stage 6: maintenance after deployment",
+        "area": "Stage 6: maintenance after deployment, and the conventions of this stage",
         "paths": []
       },
       {
@@ -73,6 +73,11 @@
           ".claude/**",
           ".wongchon/config.json"
         ]
+      },
+      {
+        "name": "repo",
+        "area": "The same edit across the areas of several other scopes, such as a rename",
+        "paths": []
       }
     ]
   }

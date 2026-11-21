@@ -88,6 +88,7 @@ Co-authored-by: <co-author name, if any> <<co-author email>>
 - Write the whole message as plain text, including text that comes from a PR description. Do not use backticks, Markdown links, or URLs. Name a file by its path, and refer to an Issue or a PR by its number, such as `#123`.
 - Keep the whole subject line at most 72 characters. Do not count the `(#<number>)` suffix and its leading space, which GitHub adds to a squash commit.
 - Write the parts in the order of the [Template](#template).
+- Choose the type and the scope from the main change, which is the change that the commit or the PR exists to make. An edit that only supports the main change is not part of it, such as a new row in a table of links or a status update in a roadmap.
 - Follow [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/).
 - Do not split code or trailers. A line that holds one of them can be longer than 72 characters.
 

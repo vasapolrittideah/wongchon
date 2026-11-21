@@ -64,3 +64,5 @@ These PRs have the labels that the convention requires:
 | `ci: check pull request titles` | `type:ci` |
 | `feat!: read commit scopes from .wongchon/config.json` | `type:feat`, `area:agents`, `area:plugin`, `breaking` |
 | `chore: add the bootstrap conventions and agent instructions` | `type:chore`, `area:agents`, `area:conventions`, `area:deps` |
+| `feat(intent): add the intent convention` | `type:feat`, `area:intent` |
+| `chore(repo): rename the plugin from ai-dlc to wongchon` | `type:chore`, `area:repo` |
