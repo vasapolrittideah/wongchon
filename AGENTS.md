@@ -6,6 +6,8 @@ Follow these repository instructions for every task. Before you make a change, r
 
 This repository holds `ai-dlc`, a Claude Code plugin that runs an AI-native software development lifecycle in projects of any stack. The lifecycle has 6 stages: intent, design, build, verify, deploy, and maintain. Version 1 covers the stages from intent to verify.
 
+Before you plan a change, read the [Roadmap](ROADMAP.md). It states the purpose, the sources, the decisions, and the order of the work.
+
 - Keep this file free of rules that only 1 agent can follow. Version 1 supports only Claude Code, but other agents will read this file later.
 - Write scripts and hooks in Python 3.9 or later, with the standard library only.
 - Write each convention in `docs/conventions/` so that it makes sense in any project. The plugin ships these files, and its skills read them in other projects.
@@ -52,7 +54,7 @@ No linter or CI runs in this repository yet, and the only hook is the Git guard 
 
 ## Review roles
 
-No review role exists yet. The build stage adds review roles, such as a writing reviewer, and lists them in this section.
+No review role exists yet. The agent workflow phase of the [Roadmap](ROADMAP.md) adds review roles, such as a writing reviewer, and lists them in this section.
 
 ## Conventions
 

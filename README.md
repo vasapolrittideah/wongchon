@@ -22,6 +22,7 @@ You cannot install the plugin yet. This repository holds its conventions and age
 | Path | Contents |
 | --- | --- |
 | `AGENTS.md` | Instructions for agents that work in this repository. `CLAUDE.md` is a link to it. |
+| `ROADMAP.md` | The purpose, sources, decisions, and order of the work of this project |
 | `docs/conventions/` | Conventions for the artifacts that the plugin writes. The plugin ships these files. |
 | `skills/` | Third-party skills that the plugin bundles |
 | `hooks/` | Hook scripts. `git_guard.py` blocks the Git and GitHub CLI commands that only the maintainer runs. |
