@@ -18,7 +18,7 @@ The first user is the maintainer, in personal projects with different stacks. Th
 | [All Code Is Slop (Except Mine)](https://newsfilter.io/interviews/all-code-is-slop-except-mine-lauren-tan-spacexsi-342ba344fb715c56825bd332d28d494c), a summary of a keynote by Lauren Tan (Poteto), November 14, 2026 | Trust in the environment instead of the agent, the conversion of each correction into a deterministic rule, a clean codebase as the main input of agents, and review of verification artifacts instead of each line of code |
 | [Building effective agents](https://www.anthropic.com/engineering/building-effective-agents) by Erik Schluntz and Barry Zhang, Anthropic | The evaluator-optimizer, routing, and parallelization patterns that the review roles of flowspace-api use |
 | flowspace-api, a private project of the maintainer | The reference implementation: conventions, review roles, approval stamps, the Git guard, and the build modes. Agents read it but never change it. |
-| [agent-skills](https://github.com/addyosmani/agent-skills) by Addy Osmani, version 0.6.9, MIT License | Engineering skills that this project copies selectively and rewrites for its stages |
+| [agent-skills](https://github.com/addyosmani/agent-skills) by Addy Osmani, version 0.6.17, MIT License | Engineering skills that this project copies selectively and rewrites for its stages |
 
 The bundled `simple-english` and `humanizer` skills are also sources. [`skills/THIRD_PARTY.md`](skills/THIRD_PARTY.md) lists their versions and licenses.
 
