@@ -43,7 +43,7 @@ The bundled `simple-english` and `humanizer` skills are also sources. [`skills/T
 | --- | --- | --- |
 | Distribution | A Claude Code plugin named `ai-dlc`, with a marketplace in this repository | A template that projects copy, because a copy is hard to update to a new version |
 | Agents | Claude Code only in version 1. `AGENTS.md` stays free of rules for 1 agent, so that other agents can follow it later. | Claude Code and Codex from the start, because each agent needs its own review runner and hook, and Codex skips project hooks until the user trusts them |
-| Scope of version 1 | The intent, design, build, and verify stages. The deploy and maintain stages come after version 1. | All 6 stages, because the deploy and maintain stages depend most on the stack and the cloud provider of a project |
+| Scope of version 1 | The intent, design, build, and verify stages in greenfield projects, which are new projects without code. The deploy and maintain stages and brownfield projects, which are existing projects with code and documents, come after version 1. | All 6 stages, because the deploy and maintain stages depend most on the stack and the cloud provider of a project. Brownfield projects in version 1, because the first project that uses version 1 is greenfield. |
 | Stage names | `intent`, `design`, `build`, `verify`, `deploy`, and `maintain`. Approval of the plan is the gate of the build stage. | The names Plan and Test of the playbook, because `plan` is also the name of a skill and verification covers more than tests. A split into 7 stages, because a separate plan stage takes the plan gate away from the build stage. |
 | Scripts and hooks | Python 3.9 or later, with the standard library only. Each hook is a separate program that reads JSON from standard input. | Rust or Go binaries, because each platform needs its own binary. Node, because projects in other stacks do not always have it. Python with `uv`, because each user needs `uv`. |
 | Git workflow | Trunk-based development, short-lived branches, squash merges by the maintainer only, Semantic Versioning, and release-please | None recorded |
@@ -73,6 +73,7 @@ Do the phases in this order. A phase starts after the maintainer merges the PRs 
 After version 1, the work continues with these items:
 
 - The deploy and maintain stages
+- Support for brownfield projects
 - Support for other agents, such as Codex
 - A separate GitHub identity for the agent, such as a bot account or a GitHub App
 - Vale rules that target projects can turn on
@@ -114,7 +115,7 @@ Keep only the main sources in the Sources section of this roadmap. The table bel
 
 - Can a Claude Code plugin declare a dependency on another plugin? If it cannot, `README.md` lists the install steps for the `ponytail` plugin.
 - Where does a project keep the artifacts of each stage? The design phase decides this.
-- Which project documents does the framework require besides `ARCHITECTURE.md`, such as `GLOSSARY.md` and `CONSTRAINTS.md`, and what is the convention of each? How does a brownfield project move its documents? The design phase decides this.
+- Which project documents does the framework require besides `ARCHITECTURE.md`, such as `GLOSSARY.md` and `CONSTRAINTS.md`, and what is the convention of each? The design phase decides this. How a brownfield project moves its documents is decided after version 1.
 - Does the design stage use architecture decision records (ADRs)? If it does, move each decision of this roadmap that has rejected options into an ADR, and link the ADR from the Decisions table. The design phase decides this.
 - Claude Code has a built-in `/verify` skill. Does the skill of the verify stage keep the name `verify`, or does it get another name? The design phase decides this.
 
