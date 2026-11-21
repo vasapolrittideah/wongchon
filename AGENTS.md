@@ -70,6 +70,12 @@ The groups below follow the order of the work.
 | Writing or updating Markdown files or the text of pull requests and Issues | [Markdown](docs/conventions/markdown.md) |
 | Writing or updating convention files in `docs/conventions/` | [Convention files](docs/conventions/convention-files.md) |
 
+### Stages
+
+| Work | Convention |
+| --- | --- |
+| Writing or updating intents in `docs/intents/` | [Intents](docs/conventions/intents.md) |
+
 ### Delivery
 
 | Work | Convention |
