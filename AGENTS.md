@@ -21,6 +21,8 @@ This repository holds `ai-dlc`, a Claude Code plugin that runs an AI-native soft
 - Prepare and test changes on a branch, and then submit them for review through a pull request (PR).
 - The maintainer reviews and squash merges each PR.
 - Do not push directly to `main`, merge a PR, enable auto-merge, or force-push.
+- Do not change rulesets, branch protection, or the settings of the repository, and do not skip Git hooks with `--no-verify`.
+- In Claude Code, the [`hooks/git_guard.py`](hooks/git_guard.py) hook blocks the commands that break these rules. The hook finds mistakes, but it does not stop a deliberate bypass, such as a command in a script file. Follow these rules also when no hook runs.
 
 ## Git workflow
 
@@ -44,8 +46,9 @@ Run these commands before you open or update a PR:
 
 - `git diff --check origin/main...HEAD`
 - `python3 -m json.tool .ai-dlc/config.json > /dev/null`
+- `python3 -m unittest discover -s hooks`
 
-No linter, hook, or CI runs in this repository yet. Until the build stage adds them, the maintainer checks each PR against the conventions.
+No linter or CI runs in this repository yet, and the only hook is the Git guard of the [Delivery authority](#delivery-authority) section. Until the build stage adds more checks, the maintainer checks each PR against the conventions.
 
 ## Review roles
 

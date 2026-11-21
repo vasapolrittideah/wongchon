@@ -24,6 +24,8 @@ You cannot install the plugin yet. This repository holds its conventions and age
 | `AGENTS.md` | Instructions for agents that work in this repository. `CLAUDE.md` is a link to it. |
 | `docs/conventions/` | Conventions for the artifacts that the plugin writes. The plugin ships these files. |
 | `skills/` | Third-party skills that the plugin bundles |
+| `hooks/` | Hook scripts. `git_guard.py` blocks the Git and GitHub CLI commands that only the maintainer runs. |
+| `.claude/settings.json` | Claude Code settings of this repository, which run the Git guard before each shell command |
 | `.ai-dlc/config.json` | Settings of this repository for the plugin, such as the commit scopes |
 | `.github/pull_request_template.md` | The template for pull request descriptions |
 
