@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+    # edited runs the metadata check again after a change to the title or the description.
+    types: [opened, synchronize, reopened, edited]
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Checks (Python ${{ matrix.python }})
+    # shortcut: setup-python has no Python 3.9 for Ubuntu 26.04, move on when the minimum Python changes
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.9", "3.x"]
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Check diff whitespace
+        run: git diff --check origin/main...HEAD
+      - name: Check the config file
+        run: python3 -m json.tool .wongchon/config.json > /dev/null
+      - name: Test hooks
+        run: python3 -m unittest discover -s hooks
+      - name: Test scripts
+        run: python3 -m unittest discover -s scripts
+
+  pr-metadata:
+    name: PR metadata
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Check the PR title and description headings
+        # The title and the body go through env, not into the script, so they cannot inject shell code.
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: python3 scripts/check_pr_metadata.py
