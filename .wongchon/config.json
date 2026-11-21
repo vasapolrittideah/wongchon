@@ -70,7 +70,7 @@
           "AGENTS.md",
           "CLAUDE.md",
           ".claude/**",
-          ".ai-dlc/config.json"
+          ".wongchon/config.json"
         ]
       }
     ]

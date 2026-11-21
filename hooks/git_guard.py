@@ -25,7 +25,7 @@ import shlex
 import subprocess
 import sys
 
-# shortcut: a fixed name, read it from .ai-dlc/config.json when a project uses another default branch
+# shortcut: a fixed name, read it from .wongchon/config.json when a project uses another default branch
 PROTECTED_BRANCH = "main"
 
 OPERATORS = "();<>|&`\n"

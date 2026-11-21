@@ -1,6 +1,6 @@
 # GitHub label conventions
 
-This convention defines the name, color, and description of each label, and which labels to apply to GitHub Issues and pull requests (PRs). The labels come from the [Types](commit-messages.md#types) of the commit message conventions and from the `commit.scopes` list of `.ai-dlc/config.json`, so no separate label list exists.
+This convention defines the name, color, and description of each label, and which labels to apply to GitHub Issues and pull requests (PRs). The labels come from the [Types](commit-messages.md#types) of the commit message conventions and from the `commit.scopes` list of `.wongchon/config.json`, so no separate label list exists.
 
 ## Rules
 
@@ -62,5 +62,5 @@ These PRs have the labels that the convention requires:
 | --- | --- |
 | `feat(intent): ask for the affected systems in the intent template` | `type:feat`, `area:intent` |
 | `ci: check pull request titles` | `type:ci` |
-| `feat!: read commit scopes from .ai-dlc/config.json` | `type:feat`, `area:agents`, `area:plugin`, `breaking` |
+| `feat!: read commit scopes from .wongchon/config.json` | `type:feat`, `area:agents`, `area:plugin`, `breaking` |
 | `chore: add the bootstrap conventions and agent instructions` | `type:chore`, `area:agents`, `area:conventions`, `area:deps` |

@@ -27,9 +27,9 @@ Co-authored-by: <co-author name, if any> <<co-author email>>
 ### Scope
 
 - Choose the scope with these steps, and stop after the first match:
-  1. Use the first scope in the `commit.scopes` list of `.ai-dlc/config.json` that covers all of the main change. A scope covers a change when its `paths` match each changed file. If its `paths` list is empty, the scope covers a change that its `area` describes.
+  1. Use the first scope in the `commit.scopes` list of `.wongchon/config.json` that covers all of the main change. A scope covers a change when its `paths` match each changed file. If its `paths` list is empty, the scope covers a change that its `area` describes.
   2. If no scope covers all of the main change, omit the scope.
-- If the project has no `.ai-dlc/config.json` file or no `commit.scopes` list, omit the scope.
+- If the project has no `.wongchon/config.json` file or no `commit.scopes` list, omit the scope.
 - If a PR adds an area that no scope covers, such as a new service, add a scope for the area to `commit.scopes` in the same PR.
 - Write each scope in `commit.scopes` as an object with `name`, `area`, and `paths` fields. The `area` states what the scope covers, and `paths` lists glob patterns from the repository root. Order the scopes from the most specific to the most general, because the first match wins.
 - Use only the names in `commit.scopes`. A scope can have the same name as a type, such as `build(build)`.
@@ -164,7 +164,7 @@ ci: check pull request titles
 This subject has a breaking marker, because users must move their settings to a new file:
 
 ```text
-feat!: read commit scopes from .ai-dlc/config.json
+feat!: read commit scopes from .wongchon/config.json
 ```
 
 This subject reverts an earlier commit with its scope and description:

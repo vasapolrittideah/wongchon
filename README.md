@@ -1,6 +1,6 @@
-# ai-dlc
+# wongchon
 
-`ai-dlc` is a Claude Code plugin that runs an AI-native software development lifecycle in projects of any stack. It takes each change through 6 stages, and each stage has a gate that the change must pass before the next stage starts.
+`wongchon`, the Thai word for cycle, is a Claude Code plugin that runs an AI-native software development lifecycle in projects of any stack. It takes each change through 6 stages, and each stage has a gate that the change must pass before the next stage starts.
 
 ## Stages
 
@@ -27,7 +27,7 @@ You cannot install the plugin yet. This repository holds its conventions and age
 | `skills/` | Third-party skills that the plugin bundles |
 | `hooks/` | Hook scripts. `git_guard.py` blocks the Git and GitHub CLI commands that only the maintainer runs. |
 | `.claude/settings.json` | Claude Code settings of this repository, which run the Git guard before each shell command |
-| `.ai-dlc/config.json` | Settings of this repository for the plugin, such as the commit scopes |
+| `.wongchon/config.json` | Settings of this repository for the plugin, such as the commit scopes |
 | `.github/pull_request_template.md` | The template for pull request descriptions |
 
 ## Contributing

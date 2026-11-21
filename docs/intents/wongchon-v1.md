@@ -1,8 +1,8 @@
-# Intent: ai-dlc-framework version 1
+# Intent: wongchon version 1
 
 Author: Vasapol Rittideah
 
-Status: `Draft`
+Status: `Approved`
 
 ## Problem
 
@@ -10,13 +10,13 @@ The maintainer has a working agent workflow in the flowspace-api project, but th
 
 ## Outcome
 
-`ai-dlc` is a Claude Code plugin that the maintainer installs in each personal project. The [Roadmap](../../ROADMAP.md) states its purpose, principles, and decisions. Version 1 has these results:
+`wongchon` is a Claude Code plugin that the maintainer installs in each personal project. The [Roadmap](../../ROADMAP.md) states its purpose, principles, and decisions. Version 1 has these results:
 
 - Each change goes through the intent, design, build, and verify stages. The maintainer approves the gate of each stage when they merge its pull request (PR).
 - Agents get the context of each project from the project documents that the framework requires. `ARCHITECTURE.md` at the root is one of them.
 - A change has these files: an intent, a design with architecture decision records (ADRs) when the design rejects options, a plan, the code and its tests, and the verification evidence. The evidence is a committed file. The Verification section of the PR summarizes the evidence and links the file.
 - A small change that fits in 1 PR skips the intent and design stages and starts at the build stage. It still goes through the review gate and the verify stage.
-- A setup command, which a project runs 1 time, creates `.ai-dlc/config.json` with the facts that the framework cannot know, such as the commit scopes and the build and test commands. It also installs the hooks of the framework. It does not create `ARCHITECTURE.md`, because a greenfield project writes that file after the build. A greenfield project is a new project that has no code yet.
+- A setup command, which a project runs 1 time, creates `.wongchon/config.json` with the facts that the framework cannot know, such as the commit scopes and the build and test commands. It also installs the hooks of the framework. It does not create `ARCHITECTURE.md`, because a greenfield project writes that file after the build. A greenfield project is a new project that has no code yet.
 
 ## Success criteria
 
@@ -29,7 +29,7 @@ The maintainer has a working agent workflow in the flowspace-api project, but th
 - The maintainer is the only user, in personal projects with different stacks.
 - Claude Code is the only agent that runs the plugin.
 - GitHub holds the PRs whose merges approve the gates, and the CI checks of each project.
-- Each target project holds its stage artifacts, its project documents, its `.ai-dlc/config.json` file, and the checks of the rules in its `ARCHITECTURE.md`.
+- Each target project holds its stage artifacts, its project documents, its `.wongchon/config.json` file, and the checks of the rules in its `ARCHITECTURE.md`.
 - This repository holds the source of the plugin and the sample project of the eval suite.
 - The flowspace-api project is the reference implementation. Agents read it but never change it.
 
@@ -65,7 +65,7 @@ The design phase decides these questions:
 | Does version 1 support brownfield projects, or can that wait? | It can wait until after version 1, because the first project is greenfield. The design of version 1 must not assume that a project has no code or no documents. |
 | Can a small change skip stages? | Yes. A small change that fits in 1 PR skips the intent and design stages and starts at the build stage. It still goes through the review gate and the verify stage. The design phase writes the rule that decides which changes are small. |
 | Is the verification evidence a committed file, or only text in the PR? | A committed file, so that the verify stage has its own artifact. The Verification section of the PR summarizes the evidence and links the file. The design phase decides where the file goes. |
-| Does version 1 have a setup command that a project runs 1 time? | Yes. It creates `.ai-dlc/config.json` from the facts of the project and installs the hooks. It does not create `ARCHITECTURE.md`. The design phase decides its name and steps. |
+| Does version 1 have a setup command that a project runs 1 time? | Yes. It creates `.wongchon/config.json` from the facts of the project and installs the hooks. It does not create `ARCHITECTURE.md`. The design phase decides its name and steps. |
 | What is the main constraint of the framework? | The review time of the maintainer, not the cost of tokens. Each gate must be a decision from a short artifact and the evidence of its checks. |
 | Where does this first intent go until the design phase decides the location of stage artifacts? | In `docs/intents/`, 1 folder for the intents. |
 | Does an intent have a status? | Yes. An intent has an Author line and a Status line, and a CI check blocks the merge of an intent until its status is `Approved`. |

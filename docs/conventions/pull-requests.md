@@ -108,7 +108,7 @@ A PR has a title, [Result](#result), [What changed](#what-changed), [Why](#why),
 
 ### Follow-up tasks
 
-- If the work has an open Issue, write `- #<Issue number>: <remaining work>.` If the work has no open Issue, write `- <remaining work>.`, such as `- Add the paths of the stage scopes to .ai-dlc/config.json.`
+- If the work has an open Issue, write `- #<Issue number>: <remaining work>.` If the work has no open Issue, write `- <remaining work>.`, such as `- Add the paths of the stage scopes to .wongchon/config.json.`
 - Write 1 bullet for each piece of work for later, even when there is only 1.
 - Write the remaining work as 1 sentence that names the work. GitHub shows only the number of an Issue, so the sentence must name the work.
 - Put the bullets with an Issue first, in ascending Issue number. Then put the bullets without an Issue.
