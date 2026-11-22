@@ -2,7 +2,7 @@
 
 Author: Vasapol Rittideah
 
-Status: `Draft`
+Status: `Approved`
 
 Intent: [`docs/intents/plugin-review-gate.md`](../intents/plugin-review-gate.md)
 
