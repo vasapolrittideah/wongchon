@@ -79,6 +79,7 @@ The groups below follow the order of the work.
 | --- | --- |
 | Writing or updating intents in `docs/intents/` | [Intents](docs/conventions/intents.md) |
 | Writing or updating specs in `docs/specs/` | [Specs](docs/conventions/specs.md) |
+| Writing or updating architecture decision records (ADRs) in `docs/adrs/` | [Architecture decision records](docs/conventions/adrs.md) |
 
 ### Delivery
 
