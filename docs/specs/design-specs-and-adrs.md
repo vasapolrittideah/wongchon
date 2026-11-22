@@ -2,7 +2,7 @@
 
 Author: Vasapol Rittideah
 
-Status: `Draft`
+Status: `Approved`
 
 Intent: [`docs/intents/design-specs-and-adrs.md`](../intents/design-specs-and-adrs.md)
 
