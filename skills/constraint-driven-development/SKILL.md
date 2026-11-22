@@ -103,23 +103,11 @@ Write it with the template and the rules of the [constraints convention](../../d
 - **Measured, not yet enforced** — 1 row for each measure that no rule blocks yet.
 - **Exceptions** — 1 row for each exception, with an owner and a date at most 90 days away.
 
-For a TypeScript web app, the file can look like this:
+The convention defines the title, the introduction, the Floor rules, and the format of each section. For the Check column of F4, the secrets tool of Step 4 fits, such as `gitleaks dir . --redact --no-banner`.
+
+For a TypeScript web app, the rows of Constraints and Measured, not yet enforced can look like this:
 
 ```markdown
-# Constraints
-
-This file states the quality bar of the project. Each rule names the check that enforces it.
-
-## Floor
-
-| ID | Rule | Check |
-| --- | --- | --- |
-| F1 | Each linter directive that turns off a check names each rule that it turns off, and the PR description states the reason. | None yet |
-| F2 | The code has no unimplemented stub, no empty error handler, and no marker for later work, such as `TODO` or `FIXME`. | None yet |
-| F3 | No change skips or deletes a test or removes an assertion, unless Exceptions has a row for it. | None yet |
-| F4 | No file has a secret, such as a password, a private key, or an access token. | `gitleaks dir . --redact --no-banner` |
-| F5 | No change weakens this file, unless Exceptions has a row for it. A change can tighten a rule. | None yet |
-
 ## Constraints
 
 | ID | Dimension | Rule | Check | Runs at | Reason |
@@ -138,12 +126,6 @@ This file states the quality bar of the project. Each rule names the check that 
 | --- | --- | --- | --- | --- |
 | M1 | Project coverage | Line coverage of the project | `vitest run --coverage` | 62.4% or more |
 | M2 | Bundle size | Size of the main bundle | `size-limit --json` | 184 kB or less |
-
-## Exceptions
-
-| ID | Rule | Path | Reason | Owner | Expires |
-| --- | --- | --- | --- | --- | --- |
-| E1 | C2 | `src/legacy/**` | The legacy module breaks `no-explicit-any`. A rewrite with typed models replaces it. | Kim Lee | 2027-02-15 |
 ```
 
 Every row names the command that produces the verdict. A dimension with a
