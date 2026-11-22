@@ -52,7 +52,7 @@ If the goal of a change moves after its intent merged, change the intent in a ne
 
 Before you commit the intent, make sure that each item is true:
 
-- [ ] The file is `docs/intents/<change name>.md`, and the change name is lowercase words and numbers separated by single hyphens.
+- [ ] The file is `docs/intents/<change name>.md`, and the change name follows the Naming and location rules of the intent convention: `<scope>-<capability>` in lowercase words and numbers separated by single hyphens, with no project name or version.
 - [ ] The intent has each section of the template of the intent convention, in the template order. Open questions and References are present only when they have content.
 - [ ] The status is `Draft` until the owner approves the intent.
 - [ ] Each success criterion is a result that a person or a check can observe.
