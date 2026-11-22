@@ -174,7 +174,7 @@ A PR has a title, [Result](#result), [What changed](#what-changed), [Why](#why),
 ### Status and approval
 
 - Open the PR as a draft.
-- After the PR meets each condition of a ready PR, run `gh pr ready`, and tell the maintainer that the PR is ready. A ready PR has a complete description and the correct labels, the checks of the [Workflow](#workflow) rules pass, and CI passes when the repository has CI.
+- After the PR meets each condition of a ready PR, run `gh pr ready`, and tell the maintainer that the PR is ready. A ready PR has a complete description and the correct labels, the checks of the [Workflow](#workflow) rules pass, and CI passes when the repository has CI. Only a `Stage gate` job can fail in a ready PR, because it fails until the owner approves each stage artifact of the PR, such as an intent or a spec.
 - If the PR cannot become ready, keep it as a draft, and tell the maintainer which condition fails and why.
 - If the session has a chat, tell the maintainer there. If the session has no chat, tell the maintainer in a PR comment.
 
