@@ -45,8 +45,11 @@ Co-authored-by: <co-author name, if any> <<co-author email>>
 
 - Start the description with a lowercase verb in the imperative mood, such as `add` or `reject`.
 - Name the specific change, such as `reject task updates based on an outdated version`. If you use a general verb, such as `update`, give it a specific object, such as `update Python to 3.13`.
+- Use the articles a, an, and the where English grammar needs them, as the [English prose](english-prose.md) conventions require for other text, such as `add the ADR convention`.
+- Omit an article before a name or an identifier, before a noun that a name or a number follows, and before a plural or uncountable noun with a general meaning. Examples are `update Python to 3.13`, `release version 1.0.0`, and `remove deprecated methods`.
 - Do not end the description with a period.
 - Do not write a description that names no change, such as `misc` or `fix things`.
+- Do not omit an article only to make the subject shorter.
 
 ### Body
 
@@ -172,6 +175,18 @@ This subject reverts an earlier commit with its scope and description:
 
 ```text
 revert(intent): ask for the affected systems in the intent template
+```
+
+This subject keeps the article before `checks` and omits it before the name `Python`:
+
+```text
+ci: run the checks on Python 3.13
+```
+
+This subject does not follow the convention. It omits the article before `ADR convention`, and breaks the [Description](#description) rules:
+
+```text
+feat(design): add ADR convention
 ```
 
 ### Checkpoint commits
