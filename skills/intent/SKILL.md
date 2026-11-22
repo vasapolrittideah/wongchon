@@ -55,7 +55,7 @@ Before you commit the intent, make sure that each item is true:
 - [ ] The file is `docs/intents/<change name>.md`, and the change name follows the Naming and location rules of the intent convention: `<scope>-<capability>` in lowercase words and numbers separated by single hyphens, with no project name or version.
 - [ ] The intent has each section of the template of the intent convention, in the template order. Open questions and References are present only when they have content.
 - [ ] The status is `Draft` until the owner approves the intent.
-- [ ] Each success criterion is a result that a person or a check can observe.
+- [ ] Each success criterion starts with its ID, such as `S1`, and is a result that a person or a check can observe.
 - [ ] The intent names no file, class, function, library, or data structure, unless a constraint requires it.
 - [ ] Out of scope has at least 1 item.
 - [ ] Each open question names the stage that decides it, and no open question changes the problem, the outcome, the success criteria, or the scope.
