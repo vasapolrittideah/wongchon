@@ -51,8 +51,9 @@ Run these commands before you open or update a PR:
 - `python3 -m unittest discover -s hooks`
 - `python3 -m unittest discover -s scripts`
 - `PR_TITLE='<PR title>' PR_BODY="$(cat <PR description file>)" python3 scripts/check_pr_metadata.py`
+- `python3 scripts/check_stage_gate.py`
 
-The CI workflow in `.github/workflows/ci.yml` runs these checks on each PR to `main`, on Python 3.9 and the latest Python. No linter runs yet, and the only hook is the Git guard of the [Delivery authority](#delivery-authority) section. Until the build stage adds more checks, the maintainer checks each PR against the conventions.
+The CI workflow in `.github/workflows/ci.yml` runs these checks on each PR to `main`, on Python 3.9 and the latest Python. The stage gate check fails while an intent or a spec that the PR changes is not `Approved`. This failure is expected until the owner approves the artifact, and it does not stop a PR from becoming ready, as the [Status and approval](docs/conventions/pull-requests.md#status-and-approval) rules of the pull request conventions state. No linter runs yet, and the only hook is the Git guard of the [Delivery authority](#delivery-authority) section. Until the build stage adds more checks, the maintainer checks each PR against the conventions.
 
 ## Review roles
 
