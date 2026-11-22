@@ -23,7 +23,7 @@ Status: <status value>
 
 ## Success criteria
 
-- <observable result>
+- <criterion ID>: <observable result>
 
 ## Affected users and systems
 
@@ -81,8 +81,10 @@ Status: <status value>
 
 ### Success criteria
 
-- Write each criterion as a result that a person or a check can observe, such as "The maintainer installs the plugin in a project that uses another stack". The verify stage collects its evidence against these criteria.
+- Write each criterion as a result that a person or a check can observe, such as "The maintainer installs the plugin in a project that uses another stack". The spec of the change turns each criterion into requirements, and the verify stage collects evidence against the requirements.
+- Start each criterion with its ID: `S` and the number of the criterion in the list, such as `S1`. The requirements of the spec name these IDs.
 - If a criterion is about an amount, such as speed or size, give the number.
+- Do not change the ID of a criterion after the intent merges. If a later PR removes a criterion, do not give its ID to another criterion.
 - Do not write a criterion that nobody can observe, such as "easy to use" or "fast".
 
 ### Affected users and systems
@@ -169,16 +171,16 @@ Status: <status value>
 These criteria follow the convention, because a person or a check can observe each one:
 
 ```markdown
-- A user who changes their email address receives a confirmation code at the new address.
-- The old address keeps working until the user enters the code.
-- 95% of confirmation emails arrive within 60 seconds.
+- S1: A user who changes their email address receives a confirmation code at the new address.
+- S2: The old address keeps working until the user enters the code.
+- S3: 95% of confirmation emails arrive within 60 seconds.
 ```
 
 These criteria do not follow the convention. The first criterion breaks the Success criteria rules, because nobody can observe "seamless". The second criterion names a library, and breaks the Format and content rules.
 
 ```markdown
-- Email changes are seamless.
-- The service sends the code with the Nodemailer library.
+- S1: Email changes are seamless.
+- S2: The service sends the code with the Nodemailer library.
 ```
 
 ### Change names
