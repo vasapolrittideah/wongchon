@@ -2,7 +2,7 @@
 
 Status: `Accepted`
 
-Spec: None
+Spec: [`docs/specs/design-specs-and-adrs.md`](../specs/design-specs-and-adrs.md)
 
 ## Context
 
