@@ -7,7 +7,7 @@
 | Stage | Covers | Version |
 | --- | --- | --- |
 | Intent | The intent of a change | 1 |
-| Design | The spec of a change, which states how to build it, and its architecture decision records (ADRs) | 1 |
+| Design | The spec of a change, which states how to build it, and its decision records | 1 |
 | Build | Plans and implementation. Approval of the plan is the gate of this stage. | 1 |
 | Verify | Tests, builds, visual checks, and evals | 1 |
 | Deploy | Deployment | Later |

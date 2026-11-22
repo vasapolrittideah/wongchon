@@ -75,7 +75,7 @@ This change copies 4 skills of agent-skills at version 0.6.17 and rewrites them 
 | `documentation-and-adrs` | The ADR part | Write ADRs in `docs/adr/` with the ADR convention. Remove the rules for comments, which the [Code comments](../../ROADMAP.md#decisions) decision replaces. |
 | `constraint-driven-development` | The interview about the quality bar, and the defaults for each dimension | Write `CONSTRAINTS.md` with its convention. Remove the Node script of the skill, because scripts of this project use Python. |
 
-The `spec` skill runs the design stage for 1 change, in the same way as the `intent` skill runs the intent stage. The skill has the name of the artifact that it writes, because the word design names only the stage, and the stage writes a spec and its ADRs:
+The `design` skill runs the design stage for 1 change, in the same way as the `intent` skill runs the intent stage:
 
 1. Read the approved intent of the change and the project documents.
 2. Give the research to a read-only subagent, and keep each source for the References section.
@@ -105,7 +105,7 @@ Phase 3 delivers these PRs in this order. Each PR is 1 reviewable change.
 5. The conventions of `CONSTRAINTS.md` and `GLOSSARY.md`
 6. The `Stage gate` CI job, and its exception in the ready rule of the pull request conventions
 7. The copies of the 4 skills of agent-skills, rewritten for the design stage
-8. The `spec` skill
+8. The `design` skill
 
 ## Open questions
 
