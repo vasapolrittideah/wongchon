@@ -1,6 +1,6 @@
 ---
 name: api-and-interface-design
-description: Guides stable API and interface design. Use when designing APIs, module boundaries, or any public interface. Use when creating REST or GraphQL endpoints, defining type contracts between modules, or establishing boundaries between frontend and backend.
+description: Guides stable API and interface design, and writes each contract in the Design section of the spec of the change. Use in the design stage when designing APIs, module boundaries, or any public interface. Use when creating REST or GraphQL endpoints, defining type contracts between modules, or establishing boundaries between frontend and backend.
 ---
 
 # API and Interface Design
@@ -8,6 +8,8 @@ description: Guides stable API and interface design. Use when designing APIs, mo
 ## Overview
 
 Design stable, well-documented interfaces that are hard to misuse. Good interfaces make the right thing easy and the wrong thing hard. This applies to REST APIs, GraphQL schemas, module boundaries, component props, and any surface where one piece of code talks to another.
+
+In this project, the design stage designs each interface before the build stage implements it. Write the contract of each interface in the Design section of the spec of the change, as the [spec convention](../../docs/conventions/specs.md) states. If a choice of the interface rejects options, record it in an ADR.
 
 ## When to Use
 
@@ -27,7 +29,7 @@ This means: every public behavior — including undocumented quirks, error messa
 
 - **Be intentional about what you expose.** Every observable behavior is a potential commitment.
 - **Don't leak implementation details.** If users can observe it, they will depend on it.
-- **Plan for deprecation at design time.** See `deprecation-and-migration` for how to safely remove things users depend on.
+- **Plan for deprecation at design time.** Decide how users of the interface will move off it before you ship it.
 - **Tests are not enough.** Even with perfect contract tests, Hyrum's Law means "safe" changes can break real users who depend on undocumented behavior.
 
 ### The One-Version Rule
@@ -36,7 +38,7 @@ Avoid forcing consumers to choose between multiple versions of the same dependen
 
 ### 1. Contract First
 
-Define the interface before implementing it. The contract is the spec — implementation follows.
+Define the interface before implementing it. The contract is the spec — implementation follows. Write it in the Design section of the spec of the change: its inputs, outputs, data, and errors.
 
 ```typescript
 // Define the contract first
@@ -361,6 +363,8 @@ After designing an API:
 - [ ] List endpoints support pagination
 - [ ] New fields are additive and optional (backward compatible)
 - [ ] Naming follows consistent conventions across all endpoints
+- [ ] The Design section of the spec states the contract of each interface: its inputs, outputs, data, and errors
+- [ ] Each choice that rejects options has an ADR, and the Design section links it
 - [ ] API documentation or types are committed alongside the implementation
 - [ ] State-changing endpoints either honour an idempotency key or are documented as unsafe to retry
 - [ ] The key is claimed in one atomic operation, guarded by a unique constraint
