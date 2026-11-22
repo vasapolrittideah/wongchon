@@ -78,6 +78,7 @@ The groups below follow the order of the work.
 | Work | Convention |
 | --- | --- |
 | Writing or updating intents in `docs/intents/` | [Intents](docs/conventions/intents.md) |
+| Writing or updating specs in `docs/specs/` | [Specs](docs/conventions/specs.md) |
 
 ### Delivery
 
