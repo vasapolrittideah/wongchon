@@ -1,6 +1,6 @@
 ---
 name: constraint-driven-development
-description: Establishes a project's quality bar as a written contract and stops agents quietly lowering it. Interviews the user on which dimensions matter, supplies sane default thresholds when they have no number in mind, records everything in CONSTRAINTS.md, and watches the diff for a weakened bar — new @ts-ignore or eslint-disable suppressions, skipped or deleted tests, assertions stripped out, unimplemented stubs, thresholds edited down. Use when no quality bar is written down, when the user says "set up constraints" or "define our standards", when the user wants dimensions they care about — accessibility, web performance, coverage — set up as enforced constraints, when an agent keeps silencing checks or skipping tests to get to green, when you need a coverage or performance threshold and don't know what number to pick, or when an agent writes more code than anyone will read.
+description: Establishes a project's quality bar as a written contract and stops agents quietly lowering it. Interviews the user on which dimensions matter, supplies sane default thresholds when they have no number in mind, records everything in CONSTRAINTS.md in the format of the constraints convention, and watches the diff for a weakened bar — new @ts-ignore or eslint-disable suppressions, skipped or deleted tests, assertions stripped out, unimplemented stubs, thresholds edited down. Use in the design stage of the first change of a project, when no quality bar is written down, when the user says "set up constraints" or "define our standards", when the user wants dimensions they care about — accessibility, web performance, coverage — set up as enforced constraints, when an agent keeps silencing checks or skipping tests to get to green, when you need a coverage or performance threshold and don't know what number to pick, or when an agent writes more code than anyone will read.
 ---
 
 # Constraint-Driven Development
@@ -15,6 +15,8 @@ The reason matters. When you wrote the code, reading it told you whether it was 
 
 Spec-driven development says what to build. Test-driven development proves it works. Constraint-driven development defines what "good enough to ship" means, before anyone argues about it in a pull request.
 
+In this project, the [constraints convention](../../docs/conventions/constraints.md) defines the sections of `CONSTRAINTS.md`, the Floor rules that each project copies, and how a rule or an exception changes. The design stage writes the file in the first change of the project, and a later spec updates it in the pull request of the spec.
+
 ## When to Use
 
 Apply this skill when:
@@ -24,13 +26,13 @@ Apply this skill when:
 - An agent is producing volume nobody is reading line by line
 - CI has checks but nobody can say which ones block a merge and which ones are decoration
 - Coverage, performance, or accessibility numbers get argued about per-PR instead of decided once
-- You're about to run `/build auto` or any autonomous loop, and the only thing standing between it and main is a test suite the agent also wrote
+- You're about to run any autonomous loop, and the only thing standing between it and main is a test suite the agent also wrote
 
 **When NOT to use:**
 
 - The project already has a `CONSTRAINTS.md` and the user isn't changing it — read it and follow it instead
 - One-off scripts, spikes, throwaway prototypes
-- The user wants a code review right now (`code-review-and-quality`) or a CI pipeline built (`ci-cd-and-automation`)
+- The user wants a code review right now (`code-review-and-quality`) or a CI pipeline built
 - Pre-product-market-fit code with a two-week expected lifetime — the floor below is still worth it, the rest isn't
 
 ## Loading Constraints
@@ -73,7 +75,7 @@ Say what each pick costs: (c) and (d) need a running URL, (e) needs a rules file
 ```
 Q2: When a check fails while the agent is mid-task, should it block or warn?
 GUESS: Block. You're running agents unattended and a warning nobody reads is a warning.
-DEFAULT if unsure: Block on the floor, warn on everything else for the first two weeks.
+DEFAULT if unsure: Block on the floor, and put everything else in "Measured, not yet enforced" for the first two weeks.
 ```
 
 ```
@@ -94,48 +96,58 @@ Stop at four. A twelve-question intake produces a config nobody understands and 
 
 One file at the repo root. Any agent on any harness can read it, and a change to it shows up in review where it belongs.
 
+Write it with the template and the rules of the [constraints convention](../../docs/conventions/constraints.md):
+
+- **Floor** — Copy each rule of the Floor rules table of the convention, with its ID and its text. In the Check column, name the command that checks the rule, or write `None yet` and name the follow-up task in the pull request description.
+- **Constraints** — 1 row for each dimension that the user picked, with a number, the command that checks it, where it runs, and the reason for the number.
+- **Measured, not yet enforced** — 1 row for each measure that no rule blocks yet.
+- **Exceptions** — 1 row for each exception, with an owner and a date at most 90 days away.
+
+For a TypeScript web app, the file can look like this:
+
 ```markdown
 # Constraints
 
-Last reviewed: 2026-08-08 by @addy
+This file states the quality bar of the project. Each rule names the check that enforces it.
 
-## Floor (always enforced, no setup required)
+## Floor
 
-- No new suppression comments: `@ts-ignore`, `eslint-disable`, `# noqa`, `# type: ignore`
-- No unimplemented stubs: `throw new Error("Not implemented")`, empty `catch {}`
-- No skipped or deleted tests without a reason in the commit message
-- No secrets in source
-- This file does not get weakened to make a change pass
+| ID | Rule | Check |
+| --- | --- | --- |
+| F1 | Each linter directive that turns off a check names each rule that it turns off, and the PR description states the reason. | None yet |
+| F2 | The code has no unimplemented stub, no empty error handler, and no marker for later work, such as `TODO` or `FIXME`. | None yet |
+| F3 | No change skips or deletes a test or removes an assertion, unless Exceptions has a row for it. | None yet |
+| F4 | No file has a secret, such as a password, a private key, or an access token. | `gitleaks dir . --redact --no-banner` |
+| F5 | No change weakens this file, unless Exceptions has a row for it. A change can tighten a rule. | None yet |
 
-## Enforced with numbers
+## Constraints
 
-| Dimension | Rule | Checked by | Runs at |
-|-----------|------|-----------|---------|
-| Types | Zero type errors | `tsc --noEmit` | every edit |
-| Lint | Zero errors from our config | `biome check` | every edit |
-| Secrets | No secrets in source | `gitleaks dir . --redact` | every edit |
-| Coverage | Changed lines ≥ 80% covered | `vitest run --coverage` + git diff | task end, CI |
-| Security: code | Nothing at high or above | `npm run check:security` | CI |
-| Security: deps | Nothing at high or above | `osv-scanner scan source -r .` | CI |
-| Accessibility | Zero critical or serious | `npm run check:a11y` | preview deploy |
-| Performance | LCP ≤ 2500ms, CLS ≤ 0.1 | `lighthouse $PREVIEW_URL --output=json` | preview deploy |
-
-Every row names the command that produces the verdict. A dimension with a
-number and no command in this column is an aspiration, not a constraint.
+| ID | Dimension | Rule | Check | Runs at | Reason |
+| --- | --- | --- | --- | --- | --- |
+| C1 | Types | Zero type errors | `tsc --noEmit` | edit | A type error is a bug that the compiler already found. |
+| C2 | Lint | Zero errors from our config | `biome check` | edit | The config is the agreed style. |
+| C3 | Coverage | Changed lines at least 80% covered | `vitest run --coverage` + git diff | task end, CI | 80% forces a test and allows a config line. |
+| C4 | Security: code | Zero findings of severity `ERROR` | `npm run check:security` | CI | Lower severities are mostly noise. |
+| C5 | Security: deps | Nothing at high or above | `osv-scanner scan source -r .` | CI | Lower severities are mostly noise. |
+| C6 | Accessibility | Zero axe violations | `npm run check:a11y` | CI | `axe --exit` cannot filter by impact. |
+| C7 | Performance | LCP at most 2500ms, CLS at most 0.1 | `lighthouse $PREVIEW_URL --output=json` | CI | The Core Web Vitals "good" thresholds. |
 
 ## Measured, not yet enforced
 
-| Metric | Today | Direction |
-|--------|-------|-----------|
-| Project coverage | 62.4% | must not fall |
-| Bundle size (main) | 184 kB | must not grow |
+| ID | Dimension | Measure | Command | Target |
+| --- | --- | --- | --- | --- |
+| M1 | Project coverage | Line coverage of the project | `vitest run --coverage` | 62.4% or more |
+| M2 | Bundle size | Size of the main bundle | `size-limit --json` | 184 kB or less |
 
 ## Exceptions
 
 | ID | Rule | Path | Reason | Owner | Expires |
-|----|------|------|--------|-------|---------|
-| W1 | `no-explicit-any` | `src/legacy/**` | Rewrite tracked in ENG-441 | @addy | 2026-11-01 |
+| --- | --- | --- | --- | --- | --- |
+| E1 | C2 | `src/legacy/**` | The legacy module breaks `no-explicit-any`. A rewrite with typed models replaces it. | Kim Lee | 2027-02-15 |
 ```
+
+Every row names the command that produces the verdict. A dimension with a
+number and no command in this column is an aspiration, not a constraint.
 
 Then add one line to `AGENTS.md` and `CLAUDE.md`: `Read CONSTRAINTS.md before writing code. Do not weaken it to make a change pass.`
 
@@ -150,12 +162,12 @@ Picking a dimension means installing something. Don't leave the user with a numb
 | Lint | your existing config | already there | `eslint .` / `biome check` / `ruff check` | any error |
 | Coverage (JS) | your test runner | Vitest: `npm i -D @vitest/coverage-v8`; Jest: already there | `vitest run --coverage` (or `jest --coverage`) | coverage of changed lines |
 | Coverage (Python) | pytest-cov | `pip install pytest-cov` | `pytest --cov --cov-report=lcov` | same |
-| Security: code | Semgrep | `pipx install semgrep` | `npm run check:security` (below) | high or critical, including legacy `ERROR` |
+| Security: code | Semgrep | `pipx install semgrep` | `npm run check:security` (below) | severity `ERROR` |
 | Security: secrets | gitleaks | `brew install gitleaks` | `gitleaks dir . --redact --no-banner` | any finding |
 | Security: dependencies | osv-scanner | `brew install osv-scanner` | `osv-scanner scan source -r .` | high or above |
 | Performance: page | Lighthouse | `npm i -D lighthouse` | `lighthouse $URL --output=json --quiet` | LCP, CLS, performance score |
 | Performance: bundle | size-limit | `npm i -D size-limit` | `size-limit --json` | per-entry byte budget |
-| Accessibility | axe-core | `npm i -D @axe-core/cli` | `npm run check:a11y` (below) | zero critical or serious |
+| Accessibility | axe-core | `npm i -D @axe-core/cli` | `npm run check:a11y` (below) | zero violations |
 | Architecture | dependency-cruiser | `npm i -D dependency-cruiser` | `depcruise src` | any violation |
 | Assertion quality | Stryker | `npm i -D @stryker-mutator/core` | `stryker run --mutate <changed files>` | mutation score |
 
@@ -167,8 +179,7 @@ Five things that will bite you if you skip them:
 4. **Coverage needs no second test run.** Read the lcov your suite already writes and intersect it with `git diff`. Running the suite twice to get a number is the fastest way to make people hate this.
 5. **Semgrep's registry rules are free to run; check the licence before redistributing them.** `opengrep` is a drop-in fork with the same rule format and JSON output if that matters to your legal team.
 
-`semgrep scan` and `axe` can exit 0 on findings; copy [scripts/quality-gate.mjs](scripts/quality-gate.mjs) into the project's `scripts/` directory to enforce these thresholds.
-Keep the scanner before `&&` so a failed scan stops the command.
+`semgrep scan` and `axe` exit 0 on findings by default. Pass `--error` to `semgrep scan` and `--exit` to `axe`, so that a finding fails the command. The `--exit` flag of `axe` fails on any violation and cannot filter by impact, so the accessibility rule is zero violations.
 
 Add each one to the project's own script so it's reproducible without an agent:
 
@@ -177,29 +188,30 @@ Add each one to the project's own script so it's reproducible without an agent:
   "scripts": {
     "check:fast": "tsc --noEmit && eslint . && gitleaks dir . --redact --no-banner",
     "check:task": "npm run check:fast && vitest run --coverage",
-    "check:security": "semgrep scan --config p/default --strict --json > semgrep-results.json && node scripts/quality-gate.mjs semgrep semgrep-results.json",
-    "check:a11y": "axe \"$PREVIEW_URL\" --tags wcag2a,wcag2aa,wcag21aa --stdout > axe-results.json && node scripts/quality-gate.mjs axe axe-results.json",
+    "check:security": "semgrep scan --config p/default --strict --error --severity ERROR",
+    "check:a11y": "axe \"$PREVIEW_URL\" --tags wcag2a,wcag2aa,wcag21aa --exit",
     "check:full": "npm run check:task && npm run check:security && osv-scanner scan source -r ."
   }
 }
 ```
 
-That mapping matters more than the tools. `check:fast` is what runs after an edit, `check:task` when the agent thinks it's done, `check:full` in CI. Run `check:a11y` after the preview is reachable, with `PREVIEW_URL` set (the example uses POSIX shell syntax).
+That mapping matters more than the tools. `check:fast` is what runs after an edit (`edit` in the Runs at column), `check:task` when the agent thinks it's done (`task end`), `check:full` in CI (`CI`). Run `check:a11y` after the preview is reachable, with `PREVIEW_URL` set (the example uses POSIX shell syntax).
 
 Before calling any row enforced, run its actual CI command against a known violation and a clean control. Confirm that the violation fails, the control passes, and scanner errors fail too. For a severity threshold, also confirm a below-threshold finding passes. Apply this to every dimension, including coverage and Lighthouse: generating a report alone does not enforce the number in `CONSTRAINTS.md`.
 
-The commands now live in two places — the `Checked by` column in `CONSTRAINTS.md` and these scripts. `CONSTRAINTS.md` is the canonical source: it carries the reason alongside each command and it shows up in review. The scripts are convenience wrappers that must mirror it, not a second source of truth; if they drift, the file wins.
+The commands now live in two places — the Check column in `CONSTRAINTS.md` and these scripts. `CONSTRAINTS.md` is the canonical source: it carries the reason alongside each command and it shows up in review. The scripts are convenience wrappers that must mirror it, not a second source of truth; if they drift, the file wins.
 
 ### Step 5: Wire it to the lifecycle
 
 The single biggest mistake is running everything everywhere. A check that stalls the agent gets switched off, and a gate people switched off is worse than no gate, because the bar still looks like it exists.
 
-| Phase | Command | What runs | Budget |
-|-------|---------|-----------|--------|
-| BUILD | `/build` | Types, lint, secrets, the floor | under 5s, changed file only |
-| VERIFY | `/test` | Related tests, coverage on changed lines | under 90s |
-| REVIEW | `/review` | Everything, plus the guards below | minutes |
-| SHIP | `/ship` | Direction checks, no regressions | CI |
+| Runs at | What runs | Budget |
+|---------|-----------|--------|
+| `edit` | Types, lint, secrets, the floor | under 5s, changed file only |
+| `task end` | Related tests, coverage on changed lines | under 90s |
+| `CI` | Everything, plus the guards below, direction checks, and no regressions | minutes |
+
+The [Runs at values](../../docs/conventions/constraints.md#runs-at-values) table of the constraints convention defines each value.
 
 Two rules that keep this tolerable:
 
@@ -220,7 +232,7 @@ Agents don't craft clever loopholes. They hit a red check and take the cheapest 
 
 None of this needs tooling beyond `git diff`. Tightening the bar should be silent; loosening it should be loud.
 
-Unlike the numbered dimensions, the floor has no de facto tool of its own, so an agent asked to enforce it tends to write a checker from scratch, and two agents write two different ones. A reference implementation of these five checks ships with this skill in [references/floor-guard.md](references/floor-guard.md) (diff-scoped, exit `0`/`1`/`2`, patterns adaptable per ecosystem). Adapt that rather than reinventing it, for the same reason every dimension names a de facto tool: so the mechanism is the same across runs and stacks.
+Unlike the numbered dimensions, the floor has no de facto tool of its own, so an agent asked to enforce it tends to write a checker from scratch, and two agents write two different ones. This project does not ship a check of the Floor rules yet. Until it does, write `None yet` in the Check column of each Floor rule that no command checks, and check these moves in the review.
 
 **Not all checks are equally circular.** Rank them by one question: can the agent make this pass by writing code that doesn't work?
 
@@ -234,7 +246,7 @@ A bar made entirely of the third kind is worth less than one with an outside opi
 
 Set 80% coverage on a codebase at 62% and you get a red build forever, then a team that learns to ignore red builds.
 
-The alternative asks for no decision: record where you are, then refuse to get worse. Put it in the "Measured, not yet enforced" table with today's number and a direction. Every check compares against the recorded value, not an aspiration. When a number improves, update it; when it drops, that's the finding.
+The alternative asks for no decision: record where you are, then refuse to get worse. Put it in the "Measured, not yet enforced" table, with today's number and a direction in the Target column, such as "62.4% or more". Every check compares against the recorded value, not an aspiration. When a number improves, update it; when it drops, that's the finding.
 
 This also answers a fair objection to training. Models are rewarded for passing tests, which you can evaluate in seconds. Architectural rot shows up over months and never reaches the weights. A ratchet is the missing penalty, written down where the build can see it.
 
@@ -250,7 +262,7 @@ When the user has no opinion, use these. They're chosen to be met by most codeba
 | Dependency vulnerabilities | nothing at high or above | Below that is mostly noise |
 | LCP | ≤ 2500 ms | Core Web Vitals "good" threshold |
 | CLS | ≤ 0.1 | Same |
-| Accessibility | zero critical or serious axe violations | Moderate and minor are often debatable |
+| Accessibility | zero axe violations | The `--exit` flag of `axe` cannot filter by impact; turn off a debatable rule with `--disable` and state the reason |
 | Exception lifetime | 90 days | Long enough to plan the fix, short enough to remember |
 | Ratchet tolerance | 0.5% | Absorbs drift when an unrelated file moves the number |
 
@@ -262,11 +274,11 @@ Constraints work at three levels of teeth. Start at the first.
 
 1. **Written only.** `CONSTRAINTS.md` exists and agents read it. Costs nothing, catches the honest mistakes, relies on the agent complying.
 2. **Scripted.** An `npm run check` (or `make check`) that runs the fast checks, wired into your agent's post-edit hook and your CI. Deterministic, no new dependency.
-3. **Tool-backed.** A dedicated runner that handles diff scoping, budgets, ratchets, and the guard checks. Use when the config outgrows a shell script. The floor-guard reference in [references/floor-guard.md](references/floor-guard.md) is the starting point for the guard-checks half of this.
+3. **Tool-backed.** A dedicated runner that handles diff scoping, budgets, ratchets, and the guard checks. Use when the config outgrows a shell script.
 
 Most projects should stop at 2. Move to 3 when you're maintaining more than about thirty lines of check-running shell.
 
-**A first run can be floor-only.** The floor guard is diff-only and needs no installs, so you can enforce the floor on day one and add numbered dimensions as you install each tool, rather than standing up every checker before the first commit is protected. Security tools that install machine-wide (gitleaks, osv-scanner) can also run CI-only if you'd rather keep laptops clean; declare where each dimension runs in the `Runs at` column.
+**A first run can be floor-only.** The floor needs no installs, so you can apply it on day one and add numbered dimensions as you install each tool, rather than standing up every checker before the first commit is protected. Security tools that install machine-wide (gitleaks, osv-scanner) can also run CI-only if you'd rather keep laptops clean; declare where each dimension runs in the `Runs at` column.
 
 ## Common Rationalizations
 
@@ -289,7 +301,7 @@ Stop and reconsider if you notice:
 - A checker was hand-rolled when a de facto one exists, so the team's existing config is ignored
 - Every constraint is checked by the project's own test suite, with no external opinion
 - `CONSTRAINTS.md` changed in the same commit as the feature that was failing
-- An exception has no owner, or an expiry more than a year out
+- An exception has no owner, or an expiry more than 90 days out
 - The agent proposed relaxing a threshold instead of fixing the code
 - Slow checks landed in the edit loop and someone has started passing `--no-verify`
 - Nobody has opened `CONSTRAINTS.md` since it was written
@@ -298,13 +310,13 @@ Stop and reconsider if you notice:
 
 The skill was applied correctly when:
 
-- [ ] `CONSTRAINTS.md` exists, and every number in it has a stated reason
-- [ ] The floor is enforced and passes on the current codebase without changes
+- [ ] `CONSTRAINTS.md` exists, follows the [constraints convention](../../docs/conventions/constraints.md), and every number in it has a stated reason
+- [ ] The Floor has each rule of the convention, and each Floor rule with a check passes on the current codebase without changes
 - [ ] Every dimension the user picked has a tool installed and a command that runs today
 - [ ] Each constraint says where it runs, and the fast stage stays under a few seconds
 - [ ] At least one constraint is external (not judged by this project's own tests)
-- [ ] Measured-only metrics record today's value and a direction
-- [ ] Exceptions have an owner and an expiry date
+- [ ] Measured-only metrics record today's value and a direction in the Target column
+- [ ] Exceptions have an owner and an expiry date at most 90 days away
 - [ ] `AGENTS.md` or `CLAUDE.md` points at the file
 - [ ] A trial run on the current branch produces no failures the user disagrees with
 - [ ] Each enforced command fails on a deliberate violation and scanner error, passes a clean control, and preserves the agreed severity threshold
@@ -313,7 +325,6 @@ The skill was applied correctly when:
 
 - `interview-me` — the one-question-at-a-time discipline this skill's intake borrows
 - `code-review-and-quality` — how to review; this skill decides what the review enforces
-- `ci-cd-and-automation` — building the pipeline these constraints run in
 - `test-driven-development` — the suite that coverage and mutation constraints measure
 - `security-and-hardening` — what the security dimension should contain
 - `performance-optimization` — where the performance numbers come from
