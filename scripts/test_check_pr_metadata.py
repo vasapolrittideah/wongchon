@@ -118,6 +118,29 @@ class Descriptions(unittest.TestCase):
                 self.assertEqual(self.findings(body),
                                  ["the description has an HTML comment. Delete the comments of the template"])
 
+    def test_related_artifact_paths_on_main_pass(self):
+        url = "https://github.com/owner/repo/blob/main/"
+        artifacts = "".join("- [`{0}`]({1}{0})\n".format(path, url) for path in (
+            "docs/intents/x.md", "docs/adrs/0016-block-unapproved-artifacts-with-a-stage-gate.md"))
+        body = GOOD_BODY.replace("## Related artifacts\n\nn/a", "## Related artifacts\n\n" + artifacts)
+        self.assertEqual(self.findings(body), [])
+
+    def test_related_artifact_in_other_form_fails(self):
+        url = "https://github.com/owner/repo/blob/"
+        for line in ("- [ADR-0016]({0}main/docs/adrs/0016-a.md)".format(url),
+                     "- [`docs/adrs/0016-a.md`]({0}feat/x/docs/adrs/0016-a.md)".format(url),
+                     "- [`docs/adrs/0016-a.md`]({0}main/docs/adrs/0017-b.md)".format(url),
+                     "- `docs/adrs/0016-a.md`",
+                     "- docs/adrs/0016-a.md"):
+            with self.subTest(line=line):
+                body = GOOD_BODY.replace("## Related artifacts\n\nn/a", "## Related artifacts\n\n" + line)
+                self.assertEqual(len(self.findings(body)), 1)
+                self.assertIn("does not have the form", self.findings(body)[0])
+
+    def test_related_artifacts_heading_in_code_does_not_count(self):
+        body = GOOD_BODY.replace("## Verification\n", "## Verification\n\n```text\n## Related artifacts\nx\n```\n")
+        self.assertEqual(self.findings(body), [])
+
     def test_html_comment_in_code_does_not_count(self):
         body = GOOD_BODY.replace("## Why\n", "## Why\n\nThe `<!--` marker starts a comment.\n\n```html\n<!-- x -->\n```\n")
         self.assertEqual(self.findings(body), [])

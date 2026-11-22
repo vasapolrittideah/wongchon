@@ -14,6 +14,7 @@ TYPE_ROW = re.compile(r"^\|\s*`([^`]+)`\s*\|")
 MARKUP = re.compile(r"`|\]\(|://")
 FENCE = re.compile(r"^\s*(```|~~~)")
 INLINE_CODE = re.compile(r"`[^`]*`")
+ARTIFACT = re.compile(r"^- \[`(?P<path>[^`\s]+)`\]\(https://github\.com/[^/\s]+/[^/\s]+/blob/main/(?P=path)\)$")
 
 
 def load_types(path=COMMIT_CONVENTION):
@@ -106,7 +107,28 @@ def check_body(body, expected):
             findings.append("the headings are not once each in the order of the template: " + ", ".join(expected))
     if any("<!--" in line for line in lines):
         findings.append("the description has an HTML comment. Delete the comments of the template")
-    return findings
+    return findings + check_related_artifacts(body)
+
+
+def check_related_artifacts(body):
+    section = None
+    in_block = False
+    for line in body.splitlines():
+        if FENCE.match(line):
+            in_block = not in_block
+        elif not in_block and line.startswith("## "):
+            if section is not None:
+                break
+            if line[3:].strip() == "Related artifacts":
+                section = []
+            continue
+        if section is not None and line.strip() and not line.startswith("<!--"):
+            section.append(line.strip())
+    if not section or section == ["n/a"]:
+        return []
+    return ['the Related artifacts line "{0}" does not have the form '
+            "- [`<path>`](https://github.com/<owner>/<repo>/blob/main/<path>)".format(line)
+            for line in section if not ARTIFACT.match(line)]
 
 
 def main():

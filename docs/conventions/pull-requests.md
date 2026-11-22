@@ -39,7 +39,7 @@ A PR has a title, [Result](#result), [What changed](#what-changed), [Why](#why),
 
 ## Related artifacts
 
-- <link to an artifact>
+- [`<path of an artifact>`](<URL of the artifact on main>)
 
 ## Related issues
 
@@ -122,7 +122,9 @@ A PR has a title, [Result](#result), [What changed](#what-changed), [Why](#why),
 ### Related artifacts
 
 - Write 1 bullet for each lifecycle artifact that the PR implements, changes, or depends on, such as an intent, a specification, or a plan.
-- Use the path of the artifact in backticks as the link text.
+- Write each bullet as a Markdown link. Use the path of the artifact from the root of the repository in backticks as the link text, such as `` `docs/adrs/0016-block-unapproved-artifacts-with-a-stage-gate.md` ``.
+- Do not use an ID or a title of the artifact as the link text, such as `ADR-0016`, because each bullet must have the same form.
+- Link the file on `main`, as `https://github.com/<owner>/<repo>/blob/main/<path>`, also when the PR adds the artifact. The link opens after the PR merges, and a link to the branch of the PR stops working after the branch is deleted.
 - Order the bullets by the stage of the artifact, from the earliest stage to the latest.
 - If no artifact is related, write `n/a`.
 

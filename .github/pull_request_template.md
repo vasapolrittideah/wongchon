@@ -36,7 +36,7 @@ n/a
 
 ## Related artifacts
 
-<!-- Write 1 bullet for each intent, specification, plan, or other lifecycle artifact that the PR implements, changes, or depends on, with its path in backticks as the link text. Order the bullets by stage. -->
+<!-- Write 1 bullet for each intent, specification, plan, or other lifecycle artifact that the PR implements, changes, or depends on, as - [`<path>`](https://github.com/<owner>/<repo>/blob/main/<path>). Use the path, not an ID such as ADR-0016, and link the file on `main`. Order the bullets by stage. -->
 
 n/a
 
