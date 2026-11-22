@@ -21,7 +21,7 @@ The next phase of the [Roadmap](../../ROADMAP.md), the agent workflow phase, sta
 
 ## Success criteria
 
-- An agent writes the spec of the agent workflow change with the design skill, and the maintainer approves it without an edit to a skill or a convention of the plugin during that change.
+- An agent writes the spec of the agent workflow change with the `spec` skill, and the maintainer approves it without an edit to a skill or a convention of the plugin during that change.
 - Each spec has at most 200 lines.
 - The CI check fails on a PR that changes a spec whose status is not `Approved`, and passes after the status changes to `Approved`.
 
@@ -50,8 +50,8 @@ The next phase of the [Roadmap](../../ROADMAP.md), the agent workflow phase, sta
 
 | Question | Reply |
 | --- | --- |
-| What result shows that the design stage works? | The spec of the next change, the agent workflow change, is written with the design skill instead of by hand, and the maintainer approves it without an edit to a skill or a convention during that change. |
-| Which work does this change include? | All 7 parts: the spec convention, the ADR convention, the move of the roadmap decisions into ADRs, the conventions of `CONSTRAINTS.md` and `GLOSSARY.md`, the CI check that blocks a spec without approval, the rewritten skills of agent-skills, and the design skill. |
+| What result shows that the design stage works? | The spec of the next change, the agent workflow change, is written with the `spec` skill instead of by hand, and the maintainer approves it without an edit to a skill or a convention during that change. |
+| Which work does this change include? | All 7 parts: the spec convention, the ADR convention, the move of the roadmap decisions into ADRs, the conventions of `CONSTRAINTS.md` and `GLOSSARY.md`, the CI check that blocks a spec without approval, the rewritten skills of agent-skills, and the `spec` skill. |
 | How long can a spec be so that the maintainer can review it fast? | At most 200 lines. |
 | Do review roles for specs and ADRs belong to this change? | No. They come in the agent workflow change. The layout of the plugin, the setup command, the check of small changes, `ARCHITECTURE.md`, and brownfield support also stay out, in their own phases. |
 
