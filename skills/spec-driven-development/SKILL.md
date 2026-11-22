@@ -1,44 +1,48 @@
 ---
 name: spec-driven-development
-description: Creates specs before coding. Use when starting a new project, feature, or significant change and no specification exists yet. Use when drafting a PRD or requirements document with objectives and scope, or when requirements are unclear, ambiguous, or only exist as a vague idea. Use when a single requirement spans several independently testable capabilities and needs decomposing into a capability map of modules before specifying. Use when evolving a shipped spec — scoping a V1, deferring ideas to a V2 backlog, or writing a follow-up spec for a change to an existing feature.
+description: Writes the spec of a change in docs/specs/, in the format of the spec convention, after the intent of the change is approved. Use in the design stage when a change has an approved intent and no spec yet, when the requirements of a change span several independently testable capabilities and the change needs splitting, or when the design of a change must change.
 ---
 
 # Spec-Driven Development
 
 ## Overview
 
-Write a structured specification before writing any code. The spec is the shared source of truth between you and the human engineer — it defines what we're building, why, and how we'll know it's done. Code without a spec is guessing.
+Write a structured specification before writing any code. The spec is the shared source of truth between you and the human engineer — it defines how we'll build the change and how we'll know it's done. Code without a spec is guessing.
+
+In this project, the intent of a change states what the change must achieve and why, and the spec states how to build it. The [spec convention](../../docs/conventions/specs.md) defines the file, the sections, and the status of a spec. Its ADRs record the decisions, as the [ADR convention](../../docs/conventions/adrs.md) states.
 
 ## When to Use
 
-- Starting a new project or feature
-- Requirements are ambiguous or incomplete
+- A change has an approved intent in `docs/intents/` and no spec yet
 - The change touches multiple files or modules
 - You're about to make an architectural decision
-- The task would take more than 30 minutes to implement
+- The requirements of the change span several independently testable capabilities
+- The approved spec of a change must change before the last pull request of the change merges
 
-**When NOT to use:** Single-line fixes, typo corrections, or changes where requirements are unambiguous and self-contained.
+**When NOT to use:** A change without an intent. It has no spec, and it starts at the build stage.
 
 ## The Gated Workflow
 
-Spec-driven development has four phases, preceded by a scope check (Phase 0) that activates only when one request bundles several independently testable capabilities. Do not advance to the next phase until the current one is validated.
+A change moves through the stages of the project. Each stage ends with a pull request, and the owner approves its gate when they merge it. Do not advance to the next stage until the current one is approved.
 
 ```
-SPECIFY ──→ PLAN ──→ TASKS ──→ IMPLEMENT
-   │          │        │          │
-   ▼          ▼        ▼          ▼
- Human      Human    Human      Human
- reviews    reviews  reviews    reviews
+INTENT ──→ DESIGN ──→ BUILD ──→ VERIFY
+   │          │         │         │
+   ▼          ▼         ▼         ▼
+ Owner      Owner     Owner     Owner
+ merges     merges    merges    merges
 ```
+
+This skill does the design stage: the spec and its ADRs. Before you start, read the approved intent of the change and the project documents that the spec convention names, such as `ARCHITECTURE.md`, `CONSTRAINTS.md`, and `GLOSSARY.md`.
 
 ### Phase 0: Scope Check
 
-Most requests describe one capability. If this one does, skip this phase and go straight to Specify — Phase 0 exists for the exception, not the rule, and it puts no hierarchy on single-capability features.
+Most intents describe one capability. If this one does, skip this phase and go straight to Specify — Phase 0 exists for the exception, not the rule.
 
-**Detection.** Decompose before specifying when a single requirement bundles several independently testable capabilities:
+**Detection.** Split the change before specifying when its requirements bundle several independently testable capabilities:
 
-- The requirement names distinct capabilities with their own consumers or data (e.g. identity, billing, notifications, reporting)
-- Acceptance criteria cluster into groups that could ship and be verified separately
+- The requirements name distinct capabilities with their own consumers or data (e.g. identity, billing, notifications, reporting)
+- The requirements cluster into groups that could ship and be verified separately
 - One capability could be cut or replaced without rewriting the others' requirements
 
 **Propose a capability map before writing any spec.** Small and reviewable — a module table plus a build order, not a project plan:
@@ -46,27 +50,27 @@ Most requests describe one capability. If this one does, skip this phase and go 
 ```markdown
 # Capability Map: [Initiative Name]
 
-| Module id | Responsibility | Depends on |
+| Change | Responsibility | Depends on |
 |---|---|---|
-| identity | Accounts, sessions, SSO | — |
-| billing | Plans, invoices, payments | identity |
-| notifications | Email and webhook fan-out | identity |
-| reporting | Usage dashboards | billing, notifications |
+| identity-accounts | Accounts, sessions, SSO | — |
+| billing-invoices | Plans, invoices, payments | identity-accounts |
+| notifications-fan-out | Email and webhook fan-out | identity-accounts |
+| reporting-usage | Usage dashboards | billing-invoices, notifications-fan-out |
 
-Build order: identity → billing, notifications → reporting
+Build order: identity-accounts → billing-invoices, notifications-fan-out → reporting-usage
 ```
 
-- **Stable module ids.** Kebab-case, chosen once, never renamed mid-initiative. Specs, plans, and downstream commands select work by these ids instead of guessing which spec is active.
-- **Dependency direction, no cycles.** Arrows point one way. If two modules each need the other, they are one module.
-- **Interfaces live at the boundary.** The map records that `billing` depends on `identity`; the contract between them belongs in the provider module's spec (see `api-and-interface-design` for designing it).
+- **Stable change names.** Each row is 1 change, named `<scope>-<capability>` as the [intent convention](../../docs/conventions/intents.md#naming-and-location) states. Choose each name once, and never rename it.
+- **Dependency direction, no cycles.** Arrows point one way. If two changes each need the other, they are one change.
+- **Interfaces live at the boundary.** The map records that `billing-invoices` depends on `identity-accounts`; the contract between them belongs in the spec of the provider change (see `api-and-interface-design` for designing it).
 
-**The map is gated like every phase.** The human reviews module boundaries, dependency direction, and build order before any module spec is written. Getting the map wrong is expensive; reviewing ten lines is not.
+**The map is gated like every stage.** The owner reviews the boundaries, the dependency direction, and the build order before any spec is written. Getting the map wrong is expensive; reviewing ten lines is not.
 
-**Then recurse per module.** Run Specify → Plan → Tasks → Implement for each module in dependency order. Each module gets its own spec, scoped to that module's objective, boundaries, and success criteria. Save the approved map as `spec/capability-map.md` and each module's spec alongside it in `spec/`, named by module id (`spec/SPEC-identity.md`, `spec/SPEC-billing.md`) — `/build` already accepts specs under `spec/`, and the root stays uncluttered — the map, not filename guessing, is the index of what exists.
+**Then give each row its own intent.** After the owner approves the map, each change goes through the intent stage, and then gets its own spec, in the build order.
 
 ### Phase 1: Specify
 
-Start with a high-level vision. Ask the human clarifying questions until requirements are concrete.
+Start from the approved intent. Ask the owner about each undecided choice, 1 topic at a time, with the options and your recommendation, as the [Workflow](../../docs/conventions/specs.md#workflow) rules of the spec convention state.
 
 **Surface assumptions immediately.** Before writing any spec content, list what you're assuming:
 
@@ -79,229 +83,89 @@ ASSUMPTIONS I'M MAKING:
 → Correct me now or I'll proceed with these.
 ```
 
-Don't silently fill in ambiguous requirements. The spec's entire purpose is to surface misunderstandings *before* code gets written — assumptions are the most dangerous form of misunderstanding.
+Don't silently fill in ambiguous requirements. The spec's entire purpose is to surface misunderstandings *before* code gets written — assumptions are the most dangerous form of misunderstanding. Write each assumption that nobody proved yet in the Assumptions and open questions section of the spec.
 
-**Write a spec document covering these six core areas:**
+**Write the spec with the template of the spec convention.** Save it as `docs/specs/<change name>.md`, with the status `Draft`. The sections of the upstream template of this skill have other places in this project:
 
-1. **Objective** — What are we building and why? Who is the user? What does success look like?
+- **Objective, success criteria, and out of scope** — The intent states them. The spec links the intent and names the ID of each success criterion.
+- **Commands, project structure, code style, and testing strategy** — They apply to the whole project, so `AGENTS.md`, `ARCHITECTURE.md`, and `CONSTRAINTS.md` state them. If the change changes one of them, the spec states the change.
+- **Boundaries** — The spec has `Ask first` and `Never` items for the build of this change only. The rules that always apply are in `AGENTS.md` and `CONSTRAINTS.md`.
 
-2. **Commands** — Full executable commands with flags, not just tool names.
-   ```
-   Build: npm run build
-   Test: npm test -- --coverage
-   Lint: npm run lint -- --fix
-   Dev: npm run dev
-   ```
-
-3. **Project Structure** — Where source code lives, where tests go, where docs belong.
-   ```
-   src/           → Application source code
-   src/components → React components
-   src/lib        → Shared utilities
-   tests/         → Unit and integration tests
-   e2e/           → End-to-end tests
-   docs/          → Documentation
-   ```
-
-4. **Code Style** — One real code snippet showing your style beats three paragraphs describing it. Include naming conventions, formatting rules, and examples of good output.
-
-5. **Testing Strategy** — What framework, where tests live, coverage expectations, which test levels for which concerns.
-
-6. **Boundaries** — Three-tier system:
-   - **Always do:** Run tests before commits, follow naming conventions, validate inputs
-   - **Ask first:** Database schema changes, adding dependencies, changing CI config
-   - **Never do:** Commit secrets, edit vendor directories, remove failing tests without approval
-
-**Spec template:**
-
-```markdown
-# Spec: [Project/Feature Name] — V[N]
-
-## Objective
-[What we're building and why. User stories or acceptance criteria.]
-
-## Tech Stack
-[Framework, language, key dependencies with versions]
-
-## Commands
-[Build, test, lint, dev — full commands]
-
-## Project Structure
-[Directory layout with descriptions]
-
-## Code Style
-[Example snippet + key conventions]
-
-## Testing Strategy
-[Framework, test locations, coverage requirements, test levels]
-
-## Boundaries
-- Always: [...]
-- Ask first: [...]
-- Never: [...]
-
-## Success Criteria
-[How we'll know this is done — specific, testable conditions]
-
-## Out of Scope (Deferred)
-[Ideas explicitly excluded from this version — the V2 backlog. One line each: what, and why it's deferred.]
-
-## Open Questions
-[Anything unresolved that needs human input]
-```
-
-**External spec tools:** This workflow is format-agnostic. If the project
-already uses OpenSpec or another specification system, keep that system's
-artifact format and storage conventions instead of creating a duplicate
-`SPEC.md`. This skill owns the clarification, content, and approval gates; the
-external tool owns how the approved spec is represented.
-
-**Reframe instructions as success criteria.** When receiving vague requirements, translate them into concrete conditions:
+**Turn each success criterion into requirements.** Write each requirement in the form Given, when, then, so that a test can prove it:
 
 ```
-REQUIREMENT: "Make the dashboard faster"
+SUCCESS CRITERION S1: "Users see their dashboard without a wait"
 
-REFRAMED SUCCESS CRITERIA:
-- Dashboard LCP < 2.5s on 4G connection
-- Initial data load completes in < 500ms
-- No layout shift during load (CLS < 0.1)
+REQUIREMENTS:
+1. Given a signed-in user on a 4G connection, when they open the dashboard, then its LCP is below 2.5s. Criterion: S1. Proof: end-to-end test.
+2. Given the dashboard data, when the page loads, then the initial data load completes in < 500ms. Criterion: S1. Proof: integration test.
 → Are these the right targets?
 ```
 
-This lets you loop, retry, and problem-solve toward a clear goal rather than guessing what "faster" means.
+This lets you loop, retry, and problem-solve toward a clear goal rather than guessing what "without a wait" means. If a success criterion is too vague to turn into requirements, stop, and ask the owner whether the intent must change.
 
 **Stop after writing the spec (CRITICAL).** Once the spec is saved:
 
-1. Summarize it and list any Open Questions.
-2. Ask the human to approve it or request changes.
-3. **STOP YOUR TURN IMMEDIATELY.** Do NOT start Phase 2, invoke `planning-and-task-breakdown`, or write code in this turn. Planning starts only after the human approves the spec in a later turn.
+1. Make sure that the spec follows the spec convention, and fix each problem.
+2. Open the spec and its ADRs in 1 draft pull request, as the spec convention states.
+3. Summarize it and list any open questions.
+4. Ask the owner to approve it or request changes.
+5. **STOP YOUR TURN IMMEDIATELY.** Do NOT write the plan or code in this turn. Change the status to `Approved` only after the owner approves the spec in a later turn.
 
-### Phase 2: Plan
+### After the spec
 
-With the validated spec, generate a technical implementation plan:
+The build stage starts after the owner merges the spec. It writes the plan of the change, which states the files, the order of the work, and the tests, and then implements it. Do not put those in the spec.
 
-1. Identify the major components and their dependencies
-2. Determine the implementation order (what must be built first)
-3. Note risks and mitigation strategies
-4. Identify what can be built in parallel vs. what must be sequential
-5. Define verification checkpoints between phases
+## Keeping the Spec True
 
-> Follow `planning-and-task-breakdown` for the dependency-graph mapping and vertical-slicing mechanics behind these steps; it is the canonical source. The bullets above are a lightweight summary; if they ever diverge, `planning-and-task-breakdown` takes precedence.
->
-> **Output convention:** Save the plan to `tasks/plan.md` and record the task list in the task list target defined by `planning-and-task-breakdown` (default `tasks/todo.md`; projects may designate an external tracker instead). Create `tasks/` if it does not exist. Downstream commands (`/build`, etc.) expect these defaults.
+A spec describes 1 transition of the project, and `ARCHITECTURE.md` describes the project as it is after each transition:
 
-The plan should be reviewable: the human should be able to read it and say "yes, that's the right approach" or "no, change X."
+- **Change it before the change ships** — To change an approved spec, edit it in a new pull request, and change its status to `Draft` in that pull request. Then get the approval of the owner again.
+- **Don't change it in a plan or code pull request** — If the build finds that the design must change, stop, and change the spec first.
+- **Don't change it after the change ships** — After the last pull request of the change merges, start a new change, and write a new ADR for each changed decision.
+- **Reference the spec in PRs** — Link back to the spec that each PR implements.
 
-### Phase 3: Tasks
+## Changes to Shipped Behavior
 
-Break the plan into discrete, implementable tasks:
+A spec describes one change. New ideas and later changes don't expand it — they queue behind it.
 
-- Each task should be completable in a single focused session
-- Each task has explicit acceptance criteria
-- Each task includes a verification step (test, build, manual check)
-- Tasks are ordered by dependency, not by perceived importance
-- No task should require changing more than ~5 files
-
-> Follow `planning-and-task-breakdown` for the full task-sizing and dependency-ordering mechanics; it is the canonical source. The template below is a lightweight inline form; if they ever diverge, `planning-and-task-breakdown` takes precedence.
-
-**Task template:**
-```markdown
-- [ ] Task: [Description]
-  - Acceptance: [What must be true when done]
-  - Verify: [How to confirm — test command, build, manual check]
-  - Files: [Which files will be touched]
-```
-
-### Phase 4: Implement
-
-Execute tasks one at a time following `skills/incremental-implementation/SKILL.md` (`incremental-implementation`) and `skills/test-driven-development/SKILL.md` (`test-driven-development`). Use `skills/context-engineering/SKILL.md` (`context-engineering`) to load the right spec sections and source files at each step rather than flooding the agent with the entire spec.
-
-## Keeping the Spec Alive
-
-The spec is a living document, not a one-time artifact:
-
-- **Update when decisions change** — If you discover the data model needs to change, update the spec first, then implement.
-- **Update when scope changes** — Features added or cut should be reflected in the spec.
-- **Commit the spec** — The spec belongs in version control alongside the code.
-- **Reference the spec in PRs** — Link back to the spec section that each PR implements.
-
-## Spec Evolution: V1 Scoping and Follow-Up Changes
-
-A spec describes one version of the work. New ideas and post-ship changes don't expand it — they queue behind it.
-
-### Scope each version explicitly
-
-Label the spec with the version it describes, in the title (`# Spec: Invoice Pipeline — V1`). When a shipped delta is folded back in, bump the version — the label always states which version of the system the spec describes, and makes "that's a V2 idea" an objective call rather than a judgment made mid-build.
-
-During Specify, ideas that won't make this version go under **Out of Scope (Deferred)** — captured, not lost. This makes the V1 boundary enforceable: during implementation, anything not in the spec's requirements is out, even if it's written in the same file under Deferred. When an idea arrives mid-build, park it in the Deferred list and keep going; re-scoping happens between versions, not during one.
-
-### Follow-up changes get a delta spec
-
-Once a spec has shipped, a new requirement — swapping the storage engine, replacing a manual step with OCR, promoting a deferred V2 item — gets its own small spec rather than a hand-edit of the shipped one. A delta spec covers only what changes:
-
-```markdown
-# Spec Delta: [Change Name]
-
-Status: proposed
-
-## Objective
-[The change and why. Which deferred item or new requirement this implements.]
-
-## Current Behavior
-[What exists today — link the relevant section of the original spec.]
-
-## New Behavior
-[What will be true after the change.]
-
-## Success Criteria
-[Specific, testable conditions — including what must NOT change.]
-
-## Boundaries
-[Only deltas from the original spec's boundaries; everything else inherits.]
-```
-
-Save it alongside the original (e.g. `SPEC-postgres-migration.md` next to `SPEC.md`) and run it through the same gated workflow: human review, then plan, tasks, implement. Downstream commands know this convention — `/build auto` accepts a root-level `SPEC-<change>.md` as the spec for a follow-up change and treats it as a planning artifact in its clean-baseline check. Keep one change per delta spec — that keeps each plan/build cycle small and reviewable.
-
-After the change ships, fold the outcome into the original spec (per Keeping the Spec Alive) so it stays the source of truth for what exists, and mark the delta implemented by changing its `Status:` line to `Status: implemented`. The original spec always describes the current system; delta specs describe transitions.
+- **Park new ideas.** When an idea arrives during the design or the build, tell the owner, and keep going. It becomes a new change with its own intent, not a new requirement of this spec.
+- **Each follow-up change gets its own spec.** It covers only what changes. Its Current state section links the parts of the project that it builds on, and its requirements name each behavior that must not change.
 
 ## Common Rationalizations
 
 | Rationalization | Reality |
 |---|---|
-| "This is simple, I don't need a spec" | Simple tasks don't need *long* specs, but they still need acceptance criteria. A two-line spec is fine. |
+| "This is simple, I don't need a spec" | A simple change without an intent starts at the build stage. A change with an intent still needs its requirements written down. |
 | "I'll write the spec after I code it" | That's documentation, not specification. The spec's value is in forcing clarity *before* code. |
 | "The spec will slow us down" | A 15-minute spec prevents hours of rework. Waterfall in 15 minutes beats debugging in 15 hours. |
-| "Requirements will change anyway" | That's why the spec is a living document. An outdated spec is still better than no spec. |
 | "The user knows what they want" | Even clear requests have implicit assumptions. The spec surfaces those assumptions. |
-| "This idea is good, I'll fold it into the current spec" | Mid-build scope growth is how V1 slips. Park it under Out of Scope (Deferred) — captured without expanding the current cycle. |
-| "The feature already has a spec, I'll just edit it for the change" | A shipped spec describes what exists. A delta spec keeps the change reviewable on its own; the original gets updated after the change ships, not before. |
-| "It's one big feature; splitting it is overhead" | If acceptance criteria cluster into independently testable groups, a monolithic spec forces every downstream task to reason over the whole contract. A ten-line capability map is the cheap alternative. |
-| "I'll decompose during planning" | Planning slices tasks within a spec. By then the oversized artifact already exists — module boundaries and dependency direction must be decided before the spec is written, not after. |
+| "This idea is good, I'll fold it into the current spec" | Scope growth during the build is how a change slips. Tell the owner, and make it a new change. |
+| "The feature already has a spec, I'll just edit it for the change" | A shipped spec records a past transition. A new change with its own spec keeps the change reviewable on its own. |
+| "It's one big feature; splitting it is overhead" | If the requirements cluster into independently testable groups, a monolithic spec forces every downstream task to reason over the whole contract. A ten-line capability map is the cheap alternative. |
+| "I'll decompose during planning" | Planning slices tasks within a spec. By then the oversized artifact already exists — change boundaries and dependency direction must be decided before the spec is written, not after. |
 
 ## Red Flags
 
-- Starting to write code without any written requirements
+- Starting to write code without an approved spec for a change that has an intent
 - Asking "should I just start building?" before clarifying what "done" means
-- Implementing features not mentioned in any spec or task list
-- Making architectural decisions without documenting them
-- Skipping the spec because "it's obvious what to build"
-- V1 requirements growing mid-implementation as new ideas get written straight into the spec
-- Changing a shipped feature with no spec for the change because "the feature already has one"
+- Implementing features not mentioned in any spec or plan
+- Making architectural decisions without an ADR
+- Copying the problem, the outcome, or the success criteria of the intent into the spec
+- New requirements written straight into an approved spec during the build
+- Changing a shipped spec instead of starting a new change
 - Writing the spec and starting the plan or code in the same turn
 - One spec whose requirements span several independently testable capabilities
-- Module boundaries or build order decided implicitly during implementation because no capability map was approved up front
+- Change boundaries or build order decided implicitly during implementation because no capability map was approved up front
 
 ## Verification
 
-Before proceeding to implementation, confirm:
+Before the build stage starts, confirm:
 
-- [ ] The spec covers all six core areas (a full spec; a delta spec covers only the areas the change affects — at minimum objective, success criteria, and boundary deltas — and inherits the rest from the original)
-- [ ] The human has reviewed and approved the spec
+- [ ] The spec follows the template and the rules of the [spec convention](../../docs/conventions/specs.md), and has at most 200 lines
+- [ ] Each success criterion of the intent has at least 1 requirement, and each requirement names a test level
+- [ ] Each decision that rejects options has an ADR in the same pull request
+- [ ] The owner has reviewed and approved the spec
 - [ ] The turn ended after saving the spec; approval came in a later turn
-- [ ] Success criteria are specific and testable
-- [ ] Boundaries (Always/Ask First/Never) are defined
-- [ ] The spec is saved to a file in the repository
-- [ ] Ideas cut from this version are captured under Out of Scope (Deferred), not silently dropped or silently included
-- [ ] If this is a change to a shipped spec, it is a delta spec referencing the original, not a rewrite of it
-- [ ] If the request bundles several independently testable capabilities, a capability map (module ids, dependency direction, build order) was approved before any module spec was written
-- [ ] Every module spec traces to a module id in the approved map
+- [ ] Ideas cut from this change were given to the owner, not silently dropped or silently included
+- [ ] If the intent bundles several independently testable capabilities, a capability map (change names, dependency direction, build order) was approved before any spec was written
