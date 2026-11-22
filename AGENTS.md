@@ -80,6 +80,8 @@ The groups below follow the order of the work.
 | Writing or updating intents in `docs/intents/` | [Intents](docs/conventions/intents.md) |
 | Writing or updating specs in `docs/specs/` | [Specs](docs/conventions/specs.md) |
 | Writing or updating architecture decision records (ADRs) in `docs/adrs/` | [Architecture decision records](docs/conventions/adrs.md) |
+| Writing or updating the rules and exceptions of `CONSTRAINTS.md` | [Constraints](docs/conventions/constraints.md) |
+| Writing or updating the entries of `GLOSSARY.md` | [Glossary entries](docs/conventions/glossary-entries.md) |
 
 ### Delivery
 
