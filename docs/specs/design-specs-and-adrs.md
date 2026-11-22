@@ -33,7 +33,7 @@ A spec starts from these parts. The PR of the spec convention asks the maintaine
 
 The ADR convention defines the ADRs of a project, as the [Decision records](../../ROADMAP.md#decisions) decision states.
 
-- Save each ADR as `docs/adr/<number>-<decision>.md`. The number has 4 digits, and each new ADR takes the next number.
+- Save each ADR as `docs/adrs/<number>-<decision>.md`. The number has 4 digits, and each new ADR takes the next number.
 - Write 1 ADR for each decision of a spec that rejects options. The spec links each ADR.
 - Open the PR of an ADR with the status `Accepted`. The merge of the PR accepts the ADR.
 - Do not edit an accepted ADR. To change a decision, write a new ADR that supersedes it, and change only the status line of the old ADR.
@@ -72,7 +72,7 @@ This change copies 4 skills of agent-skills at version 0.6.17 and rewrites them 
 | --- | --- | --- |
 | `spec-driven-development` | The parts about how to build a change, such as the capability map and the delta for an existing behavior | Remove the parts that the intent already states, and write to the spec of the change instead of `SPEC.md`. |
 | `api-and-interface-design` | The design of an interface before its code | Name the spec as the place of the interface. |
-| `documentation-and-adrs` | The ADR part | Write ADRs in `docs/adr/` with the ADR convention. Remove the rules for comments, which the [Code comments](../../ROADMAP.md#decisions) decision replaces. |
+| `documentation-and-adrs` | The ADR part | Write ADRs in `docs/adrs/` with the ADR convention. Remove the rules for comments, which the [Code comments](../../ROADMAP.md#decisions) decision replaces. |
 | `constraint-driven-development` | The interview about the quality bar, and the defaults for each dimension | Write `CONSTRAINTS.md` with its convention. Remove the Node script of the skill, because scripts of this project use Python. |
 
 The `design` skill runs the design stage for 1 change, in the same way as the `intent` skill runs the intent stage:
@@ -117,9 +117,9 @@ The maintainer decides this question in the review of this spec:
 
 | Question | Reply |
 | --- | --- |
-| Where does a project keep the artifacts of each stage: 1 folder for each change, or 1 folder for each kind of artifact? | 1 folder for each kind of artifact: `docs/intents/`, `docs/specs/`, `docs/plans/`, and `docs/evidence/`, with ADRs in `docs/adr/`. |
+| Where does a project keep the artifacts of each stage: 1 folder for each change, or 1 folder for each kind of artifact? | 1 folder for each kind of artifact: `docs/intents/`, `docs/specs/`, `docs/plans/`, and `docs/evidence/`, with ADRs in `docs/adrs/`. |
 | Which project documents does the framework require besides `ARCHITECTURE.md`? | `AGENTS.md` and `CONSTRAINTS.md`. `GLOSSARY.md` is optional, and a project creates it with its first term of the domain. |
-| How does the design stage use ADRs? | ADRs go in `docs/adr/<number>-<decision>.md`. An ADR opens as `Accepted`, and the merge accepts it. An accepted ADR changes only when a new ADR supersedes it. The roadmap decisions with rejected options move into ADRs in a separate PR after the ADR convention. |
+| How does the design stage use ADRs? | ADRs go in `docs/adrs/<number>-<decision>.md`. An ADR opens as `Accepted`, and the merge accepts it. An accepted ADR changes only when a new ADR supersedes it. The roadmap decisions with rejected options move into ADRs in a separate PR after the ADR convention. |
 | Do you accept the changes to the Skills from agent-skills table? | Yes. `constraint-driven-development` moves to the design phase, `accessibility-engineering` joins the verify phase, the design phase copies only the parts of `spec-driven-development` about how to build and the ADR part of `documentation-and-adrs`, and `planning-and-task-breakdown` stays in the build phase. |
 | Who changes the status to `Approved`, and which CI check blocks the merge? | The agent, after an explicit approval of the owner. A `Stage gate` CI job fails while an intent, spec, or plan of the PR is not `Approved`, and the ready rule of the PR conventions excludes only that job. |
 
