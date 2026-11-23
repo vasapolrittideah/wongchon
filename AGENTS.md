@@ -74,7 +74,7 @@ Each review role is a role file in `reviewers/`. A review role checks a staged c
 
 In Claude Code, the [`hooks/review_guard.py`](hooks/review_guard.py) hook blocks `git commit`, `gh pr create`, and `gh pr edit` without the approval stamps that `scripts/review.py` writes for each role. Follow these steps:
 
-1. Stage the change with `git add`.
+1. Finish each edit of the change, and stage the whole change with `git add`. Each role reviews the whole staged tree, so an edit after an approval needs a new review of each role.
 2. For each role that the hook names, run `python3 scripts/review.py <role>` outside the Claude Code sandbox. The reviewer needs the login of Claude Code.
 3. Fix each `Important` finding, and stage the fix. Then run the role again with `--reply <file>`. The file holds the findings of the last round and your reply to each one.
 4. Commit with `git commit` as the only command, without `-a` or paths.

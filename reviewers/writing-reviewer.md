@@ -64,6 +64,7 @@ Write `summary` as 1 or 2 sentences about the text and the result of the review.
 ## Rules
 
 - Report each kind of problem once, and list each place of it in the `problem` field. Do not report a finding again that the author fixed.
+- Do not report a finding again that you dropped in an earlier round, even in other words, unless the change since that round made the finding correct.
 - If the reply of the author quotes a rule that shows that a finding is wrong, drop the finding. If the reply does not, keep the finding, and quote the words of the rule that support it.
 - Give the corrected text for each `Important` finding.
 - Where a convention and a skill differ, follow the convention. Each convention states its differences from the skills.
