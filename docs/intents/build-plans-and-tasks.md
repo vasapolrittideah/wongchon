@@ -6,7 +6,7 @@ Status: `Draft`
 
 ## Problem
 
-The build stage of `wongchon` has no convention and no skill. The agent wrote the plan of the `plugin-review-gate` change by hand, and no check read the plan or its Issues. The build showed only then that 2 tasks changed the same file with no order between them. The follow-up tasks of merged pull requests (PRs) are bullets without an Issue, 54 bullets in 25 PRs on November 23, 2026, so nobody tracks them. Several checks that the decisions of the [Roadmap](../../ROADMAP.md) promise do not exist yet: the checks of small changes, the stage gate for plans, and the check that a subagent cannot write. The review guard also blocks a `git commit` whose output goes to a file or a pipe with `2>&1`, although the commit has its approvals.
+The build stage of `wongchon` has no convention and no skill. The agent wrote the plan of the `plugin-review-gate` change by hand, and no check read the plan or its Issues. The build showed only then that 2 tasks changed the same file with no order between them. The follow-up tasks of merged pull requests (PRs) are bullets without an Issue, 54 bullets in 25 PRs on November 23, 2026, so nobody tracks them. Several checks that the decisions of the [Roadmap](../../ROADMAP.md) promise do not exist yet: the checks of small changes, the stage gate for plans, and the check that a subagent cannot write. The review guard also blocks a `git commit` whose output goes to a file or a pipe with `2>&1`, although the commit has its approvals. A review role also finds new problems in text that did not change since its last round, so a role often uses its 3 rounds on findings that it could have given in the first round.
 
 The next change, `plugin-skeleton-and-setup`, needs a plan and a build. This change also gives the evidence for the first success criterion (S1) of the intent of `plugin-review-gate`.
 
@@ -19,6 +19,7 @@ The next change, `plugin-skeleton-and-setup`, needs a plan and a build. This cha
 - Each follow-up task of a PR is an Issue, which the agent creates without asking the maintainer first.
 - At the start of each change, the intent skill lists the open follow-up Issues of its area. The owner of the change decides for each one: join the change, wait, or close it with a reason.
 - The follow-up tasks of the merged PRs become Issues, or close with a reason, after the maintainer approves 1 table of all of them.
+- From the second round of a review, a review role blocks a change only for the text that changed since the last round and for the findings of the last round that are not fixed. A new finding on unchanged text does not block.
 - Checks enforce the rules of the build stage and the rules that earlier decisions promise, as the success criteria state.
 
 ## Success criteria
@@ -32,11 +33,13 @@ The next change, `plugin-skeleton-and-setup`, needs a plan and a build. This cha
 - S7: A check fails when a subagent of the plugin has a tool that can write.
 - S8: The review guard allows a `git commit` with `2>&1` when the commit has the approvals of its review roles.
 - S9: When the last PR of this change merges, the maintainer checks requirement 13 of the spec of `plugin-review-gate`. Each commit and each PR of this change had the approvals of its roles, and the maintainer wrote no review comment that a role should have found.
+- S10: In the second or a later round, a review role reports a new problem in text that did not change since the last round as a finding that does not block.
 
 ## Affected users and systems
 
 - The maintainer approves 1 table of the old follow-up tasks, reviews the plan of each change, and decides the open follow-up Issues at the start of each change.
 - This repository gets the plan convention and template, the plan and build skills, the 3 copied skills, the Issues of the follow-up tasks, and the new checks.
+- The review roles of this repository block in a later round only for changed text and unfixed findings.
 - Each project that installs the plugin later gets the plan and build skills and the checks of the build stage with the plugin.
 
 ## Constraints
@@ -68,6 +71,7 @@ The design stage decides these questions:
 | Which skills of agent-skills does this change copy? | `planning-and-task-breakdown`, `incremental-implementation`, and `test-driven-development`, because the plan and build skills use them. The other 4 skills of the build phase stay in `plugin-skeleton-and-setup`, and the roadmap changes to match. |
 | How are the old follow-up tasks decided? | The agent proposes 1 table of all of them, with an Issue title or a reason to close for each one, and the maintainer approves the table once and corrects the rows that they do not agree with. The agent creates each new follow-up Issue without asking the maintainer first, and the pull request conventions change to match. |
 | How many Issues does the build skill build at the same time? | 1 Issue, or several Issues one after another in 1 session. Parallel modes come after version 1, because each parallel PR adds review time. The check of `Blocked by` links stays in this change, because the order of the Issues matters in a sequence too. |
+| Does the limit of 3 review rounds change? | No. The maintainer often reset the count after 3 rounds, and the next round then approved. The cause is new findings on unchanged text in later rounds, so from the second round a role blocks only for changed text and unfixed findings. A higher limit would hide this cause. |
 
 ## References
 
@@ -75,3 +79,4 @@ The design stage decides these questions:
 | --- | --- | --- |
 | [The AI-native SDLC playbook](https://claude.com/resources/articles/the-ai-native-sdlc-playbook) | Nothing is built without an accepted plan, tasks split by the files that they touch, and tasks that share files run one after another | The whole article, which the fetch tool returned as a summary with short quotes |
 | [Issue dependencies](https://docs.github.com/en/rest/issues/issue-dependencies) of the GitHub REST API | Issues can record `Blocked by` links that a script can read | None |
+| [How the Claude Code team does code review](https://claude.dev/blog/solving-code-review-at-anthropic/) | After the first round, a reviewer reviews only the changed lines and does not repeat a finding | The whole article, which the fetch tool returned as a summary with short quotes |
