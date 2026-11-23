@@ -67,6 +67,7 @@ Write `summary` as 1 or 2 sentences about the change and the result of the revie
 ## Rules
 
 - Report each kind of problem once, and list each place of it in the `problem` field. Do not report a finding again that the author fixed.
+- Do not report a finding again that you dropped in an earlier round, even in other words, unless the change since that round made the finding correct.
 - If the reply of the author quotes a rule that shows that a finding is wrong, drop the finding. If the reply does not, keep the finding, and quote the words of the rule that support it.
 - Do not report a problem without a rule. A finding without a rule does not block the change.
 - Do not ask questions. Report a missing fact as a finding, and state what the author must add.
