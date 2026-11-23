@@ -23,7 +23,7 @@ Do the steps in this order. If the owner must answer a question, stop your turn 
 1. Read the intent of the change in `docs/intents/`. If its status is not `Approved`, or if it has not merged, stop the skill, and tell the owner that the intent stage must end first.
 2. Read the project documents that the change builds on or changes: `ARCHITECTURE.md`, `CONSTRAINTS.md`, `GLOSSARY.md`, and the ADRs in `docs/adrs/`, where they exist.
 3. Check the scope of the change, as Phase 0 of the [`spec-driven-development`](../spec-driven-development/SKILL.md) skill states. If the requirements form groups that can ship and be tested apart, propose a capability map to the owner, and follow [Split a change](#split-a-change).
-4. Give the research to a read-only subagent. Research is, for example, the parts of the code that the change builds on, the behavior of a tool, or a standard.
+4. Give the research to the read-only [`researcher`](../../agents/researcher.md) subagent. Research is, for example, the parts of the code that the change builds on, the behavior of a tool, or a standard.
    1. Ask the subagent for the answer, its evidence as a URL or a file and line, and the parts that it did not read in full.
    2. Tell the owner in a few sentences what the research found.
    3. Keep each outside source that the spec uses for the References section of the spec.
