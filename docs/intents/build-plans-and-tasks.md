@@ -2,7 +2,7 @@
 
 Author: Vasapol Rittideah
 
-Status: `Approved`
+Status: `Draft`
 
 ## Problem
 
@@ -19,7 +19,7 @@ The next change, `plugin-skeleton-and-setup`, needs a plan and a build. This cha
 - Each follow-up task of a PR is an Issue, which the agent creates without asking the maintainer first.
 - At the start of each change, the intent skill lists the open follow-up Issues of its area. The owner of the change decides for each one: join the change, wait, or close it with a reason.
 - The follow-up tasks of the merged PRs become Issues, or close with a reason, after the maintainer approves 1 table of all of them.
-- From the second round of a review, a review role blocks a change only for the text that changed since the last round and for the findings of the last round that are not fixed. A new finding on unchanged text does not block.
+- From the second round of a review, a review role blocks a change only for the text that changed since the last round and for the findings of the last round that are not fixed. A new finding on unchanged text does not block, except a bug in code that loses data, opens a security hole, or crashes the program. The agent fixes each finding that does not block, or creates a follow-up Issue for it.
 - Checks enforce the rules of the build stage and the rules that earlier decisions promise, as the success criteria state.
 
 ## Success criteria
@@ -33,13 +33,13 @@ The next change, `plugin-skeleton-and-setup`, needs a plan and a build. This cha
 - S7: A check fails when a subagent of the plugin has a tool that can write.
 - S8: The review guard allows a `git commit` with `2>&1` when the commit has the approvals of its review roles.
 - S9: When the last PR of this change merges, the maintainer checks requirement 13 of the spec of `plugin-review-gate`. Each commit and each PR of this change had the approvals of its roles, and the maintainer wrote no review comment that a role should have found.
-- S10: In the second or a later round, a review role reports a new problem in text that did not change since the last round as a finding that does not block.
+- S10: In the second or a later round, a review role reports a new problem in text that did not change since the last round as a finding that does not block. The only exception is a bug in code that loses data, opens a security hole, or crashes the program.
 
 ## Affected users and systems
 
 - The maintainer approves 1 table of the old follow-up tasks, reviews the plan of each change, and decides the open follow-up Issues at the start of each change.
 - This repository gets the plan convention and template, the plan and build skills, the 3 copied skills, the Issues of the follow-up tasks, and the new checks.
-- The review roles of this repository block in a later round only for changed text and unfixed findings.
+- The review roles of this repository block in a later round only for changed text, unfixed findings, and bugs in code that lose data, open a security hole, or crash the program.
 - Each project that installs the plugin later gets the plan and build skills and the checks of the build stage with the plugin.
 
 ## Constraints
@@ -72,6 +72,7 @@ The design stage decides these questions:
 | How are the old follow-up tasks decided? | The agent proposes 1 table of all of them, with an Issue title or a reason to close for each one, and the maintainer approves the table once and corrects the rows that they do not agree with. The agent creates each new follow-up Issue without asking the maintainer first, and the pull request conventions change to match. |
 | How many Issues does the build skill build at the same time? | 1 Issue, or several Issues one after another in 1 session. Parallel modes come after version 1, because each parallel PR adds review time. The check of `Blocked by` links stays in this change, because the order of the Issues matters in a sequence too. |
 | Does the limit of 3 review rounds change? | No. The maintainer often reset the count after 3 rounds, and the next round then approved. The cause is new findings on unchanged text in later rounds, so from the second round a role blocks only for changed text and unfixed findings. A higher limit would hide this cause. |
+| Does a later round then miss real problems? | No. The first round reviews the whole change and can block on each line. A later round still reports each new problem, and the agent fixes it or creates a follow-up Issue. A bug in code that loses data, opens a security hole, or crashes the program still blocks in a later round, because missing it costs more than 1 round. The limit stays at 3 rounds until the verify phase measures the resets. |
 
 ## References
 
