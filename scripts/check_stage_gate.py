@@ -66,7 +66,7 @@ def main(argv=None):
         for finding in findings:
             print("- " + finding, file=sys.stderr)
         sys.exit(1)
-    print("The stage gate passes for {0} changed intents and specs.".format(len(paths)))
+    print("The stage gate of this probe branch passes for {0} changed intents and specs.".format(len(paths)))
 
 
 if __name__ == "__main__":
