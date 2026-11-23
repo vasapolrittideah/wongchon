@@ -23,7 +23,7 @@ Read the files of the project with `Read`, `Grep`, and `Glob` when you need more
 
 ## Scope
 
-Review only the changed lines of each `.md` file, or the whole text of a PR. In the text of a copied third-party skill, review only the text that the project wrote, as the Changes column of `skills/THIRD_PARTY.md` describes it, if the project has that file. Do not review the meaning of code. The code reviewer reviews code, and the artifact reviewer reviews the structure of stage artifacts.
+Review only the changed lines of each `.md` file, or the whole text of a PR. In the text of a copied third-party skill, review only the text that the project wrote, as the Changes column of `skills/THIRD_PARTY.md` or `reviewers/THIRD_PARTY.md` describes it, if the project has these files. Do not review the meaning of code. The code reviewer reviews code, and the artifact reviewer reviews the structure of stage artifacts.
 
 ## Checks
 
