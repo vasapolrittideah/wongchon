@@ -12,12 +12,12 @@ Tasks are tracked in the [wongchon](https://github.com/users/vasapolrittideah/pr
 
 1. [#32 Add the code, writing, and artifact review roles](https://github.com/vasapolrittideah/wongchon/issues/32)
 2. [#33 Add the review script that runs a role and stamps its approval](https://github.com/vasapolrittideah/wongchon/issues/33)
-3. [#34 Block commits and PRs without stamps](https://github.com/vasapolrittideah/wongchon/issues/34)
-4. [#35 Run the checks of PR data from main](https://github.com/vasapolrittideah/wongchon/issues/35)
-5. [#36 Remove the old jobs of PR data from CI](https://github.com/vasapolrittideah/wongchon/issues/36)
-6. [#37 Add the research and self-review subagents](https://github.com/vasapolrittideah/wongchon/issues/37)
-7. [#38 Copy context-engineering and name the researcher in the stage skills](https://github.com/vasapolrittideah/wongchon/issues/38)
-8. [#39 Mark phase 4 as done](https://github.com/vasapolrittideah/wongchon/issues/39)
+3. [#34 Block commits and PRs that lack the stamps of their review roles](https://github.com/vasapolrittideah/wongchon/issues/34)
+4. [#35 Run PR metadata, Stage gate, and Check changes from main](https://github.com/vasapolrittideah/wongchon/issues/35)
+5. [#36 Remove the PR metadata and Stage gate jobs from ci.yml](https://github.com/vasapolrittideah/wongchon/issues/36)
+6. [#37 Add the researcher and self-reviewer subagents and their skills](https://github.com/vasapolrittideah/wongchon/issues/37)
+7. [#38 Copy context-engineering, and use the researcher in intent and design](https://github.com/vasapolrittideah/wongchon/issues/38)
+8. [#39 Mark phase 4 as done in the roadmap](https://github.com/vasapolrittideah/wongchon/issues/39)
 
 ## Checkpoints
 
