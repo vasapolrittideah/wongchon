@@ -53,7 +53,7 @@ Run these commands before you open or update a PR:
 - `PR_TITLE='<PR title>' PR_BODY="$(cat <PR description file>)" python3 scripts/check_pr_metadata.py`
 - `python3 scripts/check_stage_gate.py`
 
-The CI workflow in `.github/workflows/ci.yml` runs these checks on each PR to `main`, on Python 3.9 and the latest Python. The stage gate check fails while an intent or a spec that the PR changes is not `Approved`. This failure is expected until the owner approves the artifact, and it does not stop a PR from becoming ready, as the [Status and approval](docs/conventions/pull-requests.md#status-and-approval) rules of the pull request conventions state. No linter runs yet, and the only hook is the Git guard of the [Delivery authority](#delivery-authority) section. Until the build stage adds more checks, the maintainer checks each PR against the conventions.
+The CI workflow in `.github/workflows/ci.yml` runs these checks on each PR to `main`, on Python 3.9 and the latest Python. The stage gate check fails while an intent or a spec that the PR changes is not `Approved`. This failure is expected until the owner approves the artifact, and it does not stop a PR from becoming ready, as the [Status and approval](docs/conventions/pull-requests.md#status-and-approval) rules of the pull request conventions state. No linter runs yet. The hooks are the Git guard of the [Delivery authority](#delivery-authority) section and the review guard of the [Review roles](#review-roles) section. Until the build stage adds more checks, the maintainer checks each PR against the conventions.
 
 ## Review roles
 
@@ -65,7 +65,15 @@ Each review role is a role file in `reviewers/`. A review role checks a staged c
 | [Writing reviewer](reviewers/writing-reviewer.md) | Each `.md` file, and the title and the description of each PR |
 | [Artifact reviewer](reviewers/artifact-reviewer.md) | `docs/intents/**`, `docs/specs/**`, `docs/adrs/**`, `CONSTRAINTS.md`, and `GLOSSARY.md` |
 
-The review script and the hook that blocks a commit or a PR without the approval of its roles come in later PRs of the `plugin-review-gate` change. Until then, the maintainer checks each PR against the conventions.
+In Claude Code, the [`hooks/review_guard.py`](hooks/review_guard.py) hook blocks `git commit`, `gh pr create`, and `gh pr edit` without the approval stamps that `scripts/review.py` writes for each role. Follow these steps:
+
+1. Stage the change with `git add`.
+2. For each role that the hook names, run `python3 scripts/review.py <role>` outside the Claude Code sandbox. The reviewer needs the login of Claude Code.
+3. Fix each `Important` finding, and stage the fix. Then run the role again with `--reply <file>`. The file holds the findings of the last round and your reply to each one.
+4. Commit with `git commit` as the only command, without `-a` or paths.
+5. Before `gh pr create` or `gh pr edit`, write the title on the first line of a file and the description after it. Then run `python3 scripts/review.py writing-reviewer --pr-text <file>`. Last, pass the same title with `--title` and a file with only the description with `--body-file`.
+
+If a role does not approve after 3 rounds, the script refuses a fourth round. Stop, and ask the maintainer. Only the maintainer resets the count with `--reset-rounds`.
 
 ## Conventions
 

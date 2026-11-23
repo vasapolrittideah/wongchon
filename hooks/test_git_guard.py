@@ -31,6 +31,15 @@ class BlockedCommands(unittest.TestCase):
                 self.assertIsNotNone(reason, "allowed: " + command)
                 self.assertIn(expected, reason)
 
+    def test_reset_of_review_rounds(self):
+        self.assert_blocked([
+            "python3 scripts/review.py code-reviewer --reset-rounds",
+            "cd /repo && python3 /repo/scripts/review.py writing-reviewer --reset-rounds=1",
+            "env python3 scripts/review.py code-reviewer --reset-rounds",
+            "timeout 60 python3 scripts/review.py code-reviewer --reset-rounds",
+            "if python3 scripts/review.py code-reviewer --reset-rounds; then :; fi",
+        ], git_guard.RESET_ROUNDS)
+
     def test_merge_pull_request(self):
         self.assert_blocked([
             "gh pr merge 12",
@@ -191,6 +200,8 @@ class AllowedCommands(unittest.TestCase):
             "git commit -m -n",
             "git push",
             "git push -u origin feat/x",
+            "python3 scripts/review.py code-reviewer",
+            "python3 scripts/review.py writing-reviewer --pr-text /tmp/pr.md --reply /tmp/reply.md",
             "git push origin HEAD",
             "git push origin HEAD:feat/x",
             "git push -n origin feat/x",
