@@ -15,9 +15,10 @@ This convention defines the format of Markdown text in this project. It covers M
 - Give each bullet 1 main point. Keep its conditions, explanations, and exceptions in the same bullet, even when it takes several sentences.
 - Use a numbered list when readers must follow steps in order or apply rules by precedence.
 - If each item has the same 2 or more attributes, such as a name and a meaning, use a table instead of bullets.
+- Put a bullet list inside a bullet only when the parent bullet names a group, such as a change or a phase, and has no other point. Put a numbered list inside a bullet only for steps or rules in order.
 - Do not put product names or ordinary words in backticks, such as PostgreSQL or Issue.
 - Do not use bold or italic text.
-- Do not put a bullet list inside another list. Only a numbered list can go inside a bullet.
+- Do not put a list inside a nested list, and do not put a bullet list inside a numbered list.
 
 ### Links and tracking
 
@@ -38,3 +39,26 @@ This convention defines the format of Markdown text in this project. It covers M
 The [`simple-english`](../../skills/simple-english/SKILL.md) skill, version 2.1.2, sets rules for the format of a document, but this convention applies where the skill and this convention differ.
 
 - Use bullets for 2 or more items, as the [Format and content](#format-and-content) rules state. The skill uses a vertical list only for 3 or more items.
+
+## Examples
+
+This What changed section of a PR groups its items under the change or the phase that they belong to:
+
+```markdown
+## What changed
+
+- `build-plans-and-tasks` in the row of phase 5:
+  - Each follow-up task becomes an Issue.
+  - An Issue title has at most 72 characters.
+- The row of phase 6:
+  - An eval of the consistency of the reviewers.
+  - Full model IDs for the review roles.
+```
+
+This list does not follow the convention. Its parent bullet states a point of its own, not only the name of the group. This breaks the [Format and content](#format-and-content) rule for a bullet list inside a bullet:
+
+```markdown
+- Add the row of phase 6, because the reviewers need more roles:
+  - An eval of the consistency of the reviewers.
+  - Full model IDs for the review roles.
+```
