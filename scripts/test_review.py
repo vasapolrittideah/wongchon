@@ -251,6 +251,12 @@ class Script(unittest.TestCase):
         self.assertEqual(self.review("code-reviewer", "--reset-rounds").returncode, 0)
         self.assertEqual(self.review("code-reviewer").returncode, 0)
 
+    def test_abbreviation_of_reset_rounds_does_not_reset(self):
+        self.review("code-reviewer", FAKE_OUTPUT=output([finding()]))
+        result = self.review("code-reviewer", "--reset")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertTrue(os.path.exists(review_rounds(self.reviews("code-reviewer"), "feat/x")))
+
     def test_approval_starts_the_count_again(self):
         self.review("code-reviewer", FAKE_OUTPUT=output([finding()]))
         self.review("code-reviewer", FAKE_OUTPUT=output([finding()]))

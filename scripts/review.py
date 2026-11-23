@@ -375,7 +375,8 @@ def review(role, pr_text=None, reply=None):
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="Review the staged change or the text of a PR with 1 review role.")
+    parser = argparse.ArgumentParser(description="Review the staged change or the text of a PR with 1 review role.",
+                                     allow_abbrev=False)
     parser.add_argument("role")
     parser.add_argument("--pr-text", help="file with the PR title on the first line and the description after it")
     parser.add_argument("--reply", help="file with the findings of the last round and the replies of the author")

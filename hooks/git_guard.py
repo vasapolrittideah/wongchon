@@ -43,6 +43,8 @@ FORCE = "Do not force-push. If a pushed commit needs a fix, add a new commit."
 NO_VERIFY = "Do not skip the Git hooks with --no-verify, or with -n on git commit. Fix the problem that the hook reports."
 MAIN_PUSH = "Do not push to or delete {0}. Push your own branch, and open a pull request."
 MAIN_COMMIT = "Do not commit on {0}. Create a branch from {0}, and commit there."
+RESET_ROUNDS = ("Only the maintainer resets the count of review rounds. Stop, and ask the maintainer to decide "
+                "after 3 rounds without an approval.")
 PUSH_ALL = "Name the branch to push. --all, --branches, and --prune can push to or delete {0}."
 
 
@@ -247,6 +249,9 @@ def check_gh(args, cwd, line):
 
 def decide(line, cwd, git=run_git):
     for words in split_commands(line):
+        if any(os.path.basename(word) == "review.py" for word in words) and any(
+                word.split("=", 1)[0] == "--reset-rounds" for word in words):
+            return RESET_ROUNDS
         while words and ASSIGNMENT.match(words[0]):
             words = words[1:]
         if words and os.path.basename(words[0]) in WRAPPERS:
