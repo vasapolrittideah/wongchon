@@ -10,8 +10,8 @@ Spec: [`docs/specs/plugin-review-gate.md`](../specs/plugin-review-gate.md)
 
 Tasks are tracked in the [wongchon](https://github.com/users/vasapolrittideah/projects/5) GitHub Project under the [plugin-review-gate](https://github.com/vasapolrittideah/wongchon/milestone/1) milestone. Each task is 1 PR, in this order, and each Issue states its result, requirements, files, proof, owner action, and the Issues that block it.
 
-1. [#32 Add the review roles](https://github.com/vasapolrittideah/wongchon/issues/32)
-2. [#33 Add the review script](https://github.com/vasapolrittideah/wongchon/issues/33)
+1. [#32 Add the code, writing, and artifact review roles](https://github.com/vasapolrittideah/wongchon/issues/32)
+2. [#33 Add the review script that runs a role and stamps its approval](https://github.com/vasapolrittideah/wongchon/issues/33)
 3. [#34 Block commits and PRs without stamps](https://github.com/vasapolrittideah/wongchon/issues/34)
 4. [#35 Run the checks of PR data from main](https://github.com/vasapolrittideah/wongchon/issues/35)
 5. [#36 Remove the old jobs of PR data from CI](https://github.com/vasapolrittideah/wongchon/issues/36)
