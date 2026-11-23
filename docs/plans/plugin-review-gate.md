@@ -2,7 +2,7 @@
 
 Author: Vasapol Rittideah
 
-Status: `Draft`
+Status: `Approved`
 
 Spec: [`docs/specs/plugin-review-gate.md`](../specs/plugin-review-gate.md)
 
