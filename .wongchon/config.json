@@ -45,7 +45,9 @@
         "paths": [
           ".claude-plugin/**",
           "hooks/**",
-          "scripts/**"
+          "scripts/**",
+          "reviewers/**",
+          "agents/**"
         ]
       },
       {
