@@ -57,7 +57,15 @@ The CI workflow in `.github/workflows/ci.yml` runs these checks on each PR to `m
 
 ## Review roles
 
-No review role exists yet. The agent workflow phase of the [Roadmap](ROADMAP.md) adds review roles, such as a writing reviewer, and lists them in this section.
+Each review role is a role file in `reviewers/`. A review role checks a staged change, or the text of a PR, in a separate read-only process, as the [plugin review gate](docs/specs/plugin-review-gate.md) spec states.
+
+| Role | Files that it reviews |
+| --- | --- |
+| [Code reviewer](reviewers/code-reviewer.md) | Each file that does not end in `.md` |
+| [Writing reviewer](reviewers/writing-reviewer.md) | Each `.md` file, and the title and the description of each PR |
+| [Artifact reviewer](reviewers/artifact-reviewer.md) | `docs/intents/**`, `docs/specs/**`, `docs/adrs/**`, `CONSTRAINTS.md`, and `GLOSSARY.md` |
+
+The review script and the hook that blocks a commit or a PR without the approval of its roles come in later PRs of the `plugin-review-gate` change. Until then, the maintainer checks each PR against the conventions.
 
 ## Conventions
 
