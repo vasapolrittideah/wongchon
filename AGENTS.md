@@ -52,8 +52,15 @@ Run these commands before you open or update a PR:
 - `python3 -m unittest discover -s scripts`
 - `PR_TITLE='<PR title>' PR_BODY="$(cat <PR description file>)" python3 scripts/check_pr_metadata.py`
 - `python3 scripts/check_stage_gate.py`
+- `python3 scripts/check_changes.py`
 
-The CI workflow in `.github/workflows/ci.yml` runs these checks on each PR to `main`, on Python 3.9 and the latest Python. The stage gate check fails while an intent or a spec that the PR changes is not `Approved`. This failure is expected until the owner approves the artifact, and it does not stop a PR from becoming ready, as the [Status and approval](docs/conventions/pull-requests.md#status-and-approval) rules of the pull request conventions state. No linter runs yet. The hooks are the Git guard of the [Delivery authority](#delivery-authority) section and the review guard of the [Review roles](#review-roles) section. Until the build stage adds more checks, the maintainer checks each PR against the conventions.
+The CI workflow in `.github/workflows/ci.yml` checks the whitespace of the diff, checks the configuration file, and runs the tests on each PR to `main`, on Python 3.9 and the latest Python.
+
+The workflow in `.github/workflows/protected-checks.yml` runs the `PR metadata`, `Stage gate`, and `Check changes` jobs. It takes the workflow file and the scripts from `main`, so a PR cannot change the result of these jobs.
+
+The stage gate check fails while an intent or a spec that the PR changes is not `Approved`. This failure is expected until the owner approves the artifact, and it does not stop a PR from becoming ready, as the [Status and approval](docs/conventions/pull-requests.md#status-and-approval) rules of the pull request conventions state.
+
+No linter runs yet. The hooks are the Git guard of the [Delivery authority](#delivery-authority) section and the review guard of the [Review roles](#review-roles) section. Until the build stage adds more checks, the maintainer checks each PR against the conventions.
 
 ## Review roles
 
