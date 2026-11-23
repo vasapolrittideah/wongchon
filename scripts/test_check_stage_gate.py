@@ -94,6 +94,31 @@ class Script(unittest.TestCase):
         self.assertIn("docs/intents/old.md has the status", result.stderr)
         self.assertNotIn("docs/specs/new.md", result.stderr)
 
+    def test_head_reads_the_artifacts_of_that_commit(self):
+        self.write("docs/specs/new.md", artifact("Draft"))
+        self.commit("draft")
+        head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=self.temp.name, check=True, stdout=subprocess.PIPE,
+                              universal_newlines=True).stdout.strip()
+        self.git("checkout", "-q", "main")
+        result = subprocess.run([sys.executable, SCRIPT, "main", "--head", head], cwd=self.temp.name,
+                                stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("docs/specs/new.md has the status", result.stderr)
+
+    def test_missing_artifact_at_the_head_cannot_be_read(self):
+        cwd = os.getcwd()
+        os.chdir(self.temp.name)
+        try:
+            with self.assertRaises(subprocess.CalledProcessError):
+                check_stage_gate.read_artifact("docs/specs/missing.md", "HEAD")
+        finally:
+            os.chdir(cwd)
+
+    def test_unknown_head_exits_2(self):
+        result = subprocess.run([sys.executable, SCRIPT, "main", "--head", "no-such-ref"], cwd=self.temp.name,
+                                stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        self.assertEqual(result.returncode, 2)
+
     def test_unknown_base_exits_2(self):
         result = subprocess.run([sys.executable, SCRIPT, "no-such-ref"], cwd=self.temp.name,
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
