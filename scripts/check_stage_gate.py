@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import argparse
 import re
 import subprocess
 import sys
@@ -10,9 +11,9 @@ APPROVED = "Approved"
 MAX_SPEC_LINES = 200
 
 
-def changed_artifacts(base):
+def changed_artifacts(base, head="HEAD"):
     output = subprocess.run(
-        ["git", "diff", "-z", "--name-only", "--diff-filter=d", base + "...HEAD"],
+        ["git", "diff", "-z", "--name-only", "--diff-filter=d", base + "..." + head],
         check=True, stdout=subprocess.PIPE, universal_newlines=True).stdout
     return [path for path in output.split("\0") if path.startswith(FOLDERS) and path.endswith(".md")]
 
@@ -31,18 +32,34 @@ def check_artifact(path, text):
     return findings
 
 
-def main():
-    base = sys.argv[1] if len(sys.argv) > 1 else "origin/main"
+def read_artifact(path, head):
+    if head is None:
+        with open(path, encoding="utf-8") as file:
+            return file.read()
+    return subprocess.run(["git", "show", "{0}:{1}".format(head, path)], check=True, stdout=subprocess.PIPE,
+                          universal_newlines=True).stdout
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description="Check the status of the changed intents and specs.")
+    parser.add_argument("base", nargs="?", default="origin/main")
+    parser.add_argument("--head", help="read the changed artifacts from this commit instead of the working tree")
+    args = parser.parse_args(argv)
+    base = args.base
     try:
-        paths = changed_artifacts(base)
+        paths = changed_artifacts(base, args.head or "HEAD")
     except subprocess.CalledProcessError:
         print("Cannot list the files that changed since {0}. Fetch {0}, or pass another base ref.".format(base),
               file=sys.stderr)
         sys.exit(2)
     findings = []
     for path in paths:
-        with open(path, encoding="utf-8") as file:
-            findings += ["{0} {1}".format(path, finding) for finding in check_artifact(path, file.read())]
+        try:
+            text = read_artifact(path, args.head)
+        except subprocess.CalledProcessError:
+            print("Cannot read {0} from {1}.".format(path, args.head), file=sys.stderr)
+            sys.exit(2)
+        findings += ["{0} {1}".format(path, finding) for finding in check_artifact(path, text)]
     if findings:
         print("The stage gate fails. See docs/conventions/intents.md and docs/conventions/specs.md:",
               file=sys.stderr)
