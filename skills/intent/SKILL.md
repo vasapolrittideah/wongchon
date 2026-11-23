@@ -23,7 +23,7 @@ Do the steps in this order. If the owner must answer a question, stop your turn 
    2. If it fits, tell the owner your estimate and its reason. Propose that the change skips the intent and design stages and starts at the build stage.
    3. Let the owner decide. If the owner chooses to skip the intent, stop this skill.
 2. If the intent depends on outside facts, research them before the interview. Outside facts are, for example, a law, a standard, or the behavior of another system. Also research when the owner asks for it.
-   1. Give the research to a read-only subagent. Ask it for the answer, its evidence as a URL or a file and line, and the parts that it did not read in full.
+   1. Give the research to the read-only [`researcher`](../../agents/researcher.md) subagent. Ask it for the answer, its evidence as a URL or a file and line, and the parts that it did not read in full.
    2. Tell the owner in a few sentences what the research found.
    3. Keep each source that the intent uses for the References section of the intent.
 3. Create a short-lived branch from the current default branch, as the branch name conventions state.
