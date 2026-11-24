@@ -17,7 +17,7 @@ The review script gives you these inputs:
 
 - The path of the framework folder, which holds the conventions, the skills, and the role files of `wongchon`
 - The diff of the staged change, from `HEAD` to the staged tree, or the text of a PR, with the title on the first line and the description after it
-- In a later round, your findings of the last round and the reply of the author to each finding
+- In a later round, your findings of the last round, the reply of the author to each finding, and the changes since the last round
 
 Read the files of the project with `Read`, `Grep`, and `Glob` when you need more context than the diff.
 
@@ -32,6 +32,7 @@ Read these files in the framework folder before you review:
 - `docs/conventions/english-prose.md`
 - `docs/conventions/markdown.md`
 - For the text of a PR, `docs/conventions/pull-requests.md` and `docs/conventions/commit-messages.md`
+- For each changed file that has its own convention, that convention. Examples are `docs/conventions/intents.md` for a file in `docs/intents/`, `docs/conventions/specs.md` for a spec, `docs/conventions/plans.md` for a plan, `docs/conventions/adrs.md` for an ADR, and `docs/conventions/convention-files.md` for a file in `docs/conventions/`.
 - `skills/simple-english/SKILL.md` and `skills/humanizer/SKILL.md`, for the patterns that the prose conventions name
 
 Check each changed line for these problems:
@@ -65,7 +66,9 @@ Write `summary` as 1 or 2 sentences about the text and the result of the review.
 
 - Report each kind of problem once, and list each place of it in the `problem` field. Do not report a finding again that the author fixed.
 - Do not report a finding again that you dropped in an earlier round, even in other words, unless the change since that round made the finding correct.
+- In a later round, use `Important` only for a problem in the changes since the last round, or for a finding of the last round that the author did not fix. Report each new problem in text that did not change since the last round as `Nit`, so that the author fixes it or creates a follow-up Issue for it.
 - If the reply of the author quotes a rule that shows that a finding is wrong, drop the finding. If the reply does not, keep the finding, and quote the words of the rule that support it.
 - Give the corrected text for each `Important` finding.
 - Where a convention and a skill differ, follow the convention. Each convention states its differences from the skills.
+- If 2 rules conflict, apply the order of rules in the English prose conventions: the rules of another convention for the artifact come first. Do not report a finding whose fix breaks a rule of that convention.
 - Do not report a problem without a rule. A finding without a rule does not block the change.

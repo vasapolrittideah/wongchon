@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import datetime
+import difflib
 import hashlib
 import json
 import os
@@ -233,11 +234,59 @@ def write_round(role, branch, count):
         file.write(str(count) + "\n")
 
 
-def reset_rounds(role, branch):
+def last_round_path(role, branch):
+    return rounds_path(role, branch) + ".last.json"
+
+
+def read_last_round(role, branch):
     try:
-        os.remove(rounds_path(role, branch))
+        with open(last_round_path(role, branch), encoding="utf-8") as file:
+            last = json.load(file)
     except FileNotFoundError:
-        pass
+        return None
+    except ValueError:
+        raise ReviewError("the last round of {0} on {1} is not JSON".format(role, branch))
+    if not isinstance(last, dict) or last.get("mode") not in ("tree", "text") or not isinstance(last.get("value"), str):
+        raise ReviewError("the last round of {0} on {1} has no mode and value".format(role, branch))
+    return last
+
+
+def write_last_round(role, branch, mode, value):
+    path = last_round_path(role, branch)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as file:
+        json.dump({"mode": mode, "value": value}, file)
+
+
+def reset_rounds(role, branch):
+    for path in (rounds_path(role, branch), last_round_path(role, branch)):
+        try:
+            os.remove(path)
+        except FileNotFoundError:
+            pass
+
+
+def text_since(last, text):
+    if last is None or last["mode"] != "text":
+        return None
+    lines = difflib.unified_diff(last["value"].splitlines(True), text.splitlines(True), "last round", "this round")
+    return "".join(lines)
+
+
+def tree_since(last, tree, pathspecs):
+    if last is None or last["mode"] != "tree":
+        return None
+    try:
+        return diff_trees(last["value"], tree, pathspecs)
+    except ReviewError:
+        print("Cannot diff the tree of the last round, so the request has no changes since the last round.",
+              file=sys.stderr)
+        return None
+
+
+def diff_trees(old, new, pathspecs):
+    return git("diff", "--no-renames", "--no-ext-diff", "--no-textconv", "--no-color", "--src-prefix=a/",
+               "--dst-prefix=b/", old, new, *pathspecs)
 
 
 def review_command():
@@ -287,7 +336,7 @@ def approves(report):
                    for finding in report["findings"])
 
 
-def build_request(mode, content, reply):
+def build_request(mode, content, reply, since=None):
     parts = [
         "Framework folder: " + FRAMEWORK_ROOT,
         "Project root: " + project_root(),
@@ -297,6 +346,8 @@ def build_request(mode, content, reply):
     ]
     if reply:
         parts += ["", "Findings of the last round and the replies of the author:", "", reply]
+    if since is not None:
+        parts += ["", "Changes since the last round:", "", since if since.strip() else "None"]
     return "\n".join(parts) + "\n"
 
 
@@ -346,9 +397,11 @@ def review(role, pr_text=None, reply=None):
         raise ReviewError(
             "{0} did not approve this branch in {1} rounds. Stop and ask the maintainer. Only the maintainer "
             "runs `python3 scripts/review.py {0} --reset-rounds` after they decide.".format(role, MAX_ROUNDS))
+    last = read_last_round(role, branch) if done else None
     if pr_text is not None:
         key = text_key(pr_text)
-        request = build_request("PR text", pr_text, reply)
+        last_mode, last_value = "text", pr_text
+        request = build_request("PR text", pr_text, reply, text_since(last, pr_text))
     else:
         tree = staged_tree()
         changed = changed_paths(tree)
@@ -357,11 +410,11 @@ def review(role, pr_text=None, reply=None):
             raise ReviewError("the staged change has no file that {0} reviews".format(role))
         key = tree
         pathspecs = [] if paths == changed else ["--"] + [":(top,literal)" + path for path in paths]
-        diff = git("diff", "--no-renames", "--no-ext-diff", "--no-textconv", "--no-color", "--src-prefix=a/",
-                   "--dst-prefix=b/", head_tree(), tree, *pathspecs)
+        diff = diff_trees(head_tree(), tree, pathspecs)
         if not diff.strip():
             raise ReviewError("the diff of the files of {0} is empty".format(role))
-        request = build_request("staged change", diff, reply)
+        last_mode, last_value = "tree", tree
+        request = build_request("staged change", diff, reply, tree_since(last, tree, pathspecs))
     report = run_reviewer(fields, body, request)
     approved = approves(report)
     if approved:
@@ -369,6 +422,7 @@ def review(role, pr_text=None, reply=None):
         reset_rounds(role, branch)
     else:
         write_round(role, branch, done + 1)
+        write_last_round(role, branch, last_mode, last_value)
     print_report(role, report, approved)
     print("round: {0} of {1}".format(done + 1, MAX_ROUNDS))
     return approved

@@ -18,7 +18,7 @@ The review script gives you these inputs:
 
 - The path of the framework folder, which holds the conventions, the skills, and the role files of `wongchon`
 - The diff of the staged change, from `HEAD` to the staged tree
-- In a later round, your findings of the last round and the reply of the author to each finding
+- In a later round, your findings of the last round, the reply of the author to each finding, and the changes since the last round
 
 Read the files of the project with `Read`, `Grep`, and `Glob` when you need more context than the diff.
 
@@ -68,6 +68,7 @@ Write `summary` as 1 or 2 sentences about the change and the result of the revie
 
 - Report each kind of problem once, and list each place of it in the `problem` field. Do not report a finding again that the author fixed.
 - Do not report a finding again that you dropped in an earlier round, even in other words, unless the change since that round made the finding correct.
+- In a later round, use `Important` only in these cases: a problem in the changes since the last round, a finding of the last round that the author did not fix, or a bug that loses data, opens a security hole, or crashes the program. Report each other new problem in code that did not change since the last round as `Nit`, so that the author fixes it or creates a follow-up Issue for it.
 - If the reply of the author quotes a rule that shows that a finding is wrong, drop the finding. If the reply does not, keep the finding, and quote the words of the rule that support it.
 - Do not report a problem without a rule. A finding without a rule does not block the change.
 - Do not ask questions. Report a missing fact as a finding, and state what the author must add.

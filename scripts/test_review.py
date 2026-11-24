@@ -291,6 +291,81 @@ class Script(unittest.TestCase):
         self.review("code-reviewer", "--reply", path)
         self.assertIn("The rule allows a shebang line.", self.calls()[0]["request"])
 
+    def test_later_round_gets_the_diff_since_the_last_round(self):
+        self.review("code-reviewer", FAKE_OUTPUT=output([finding()]))
+        self.write("a.py", "print(2)\n")
+        run(["add", "a.py"], self.repo)
+        self.review("code-reviewer", FAKE_OUTPUT=output([finding()]))
+        first, second = [call["request"] for call in self.calls()]
+        self.assertNotIn("Changes since the last round:", first)
+        since = second.split("Changes since the last round:", 1)[1]
+        self.assertIn("-print(1)", since)
+        self.assertIn("+print(2)", since)
+
+    def test_later_round_without_a_change_says_none(self):
+        self.review("code-reviewer", FAKE_OUTPUT=output([finding()]))
+        self.review("code-reviewer")
+        self.assertTrue(self.calls()[1]["request"].endswith("Changes since the last round:\n\nNone\n"))
+
+    def test_later_round_of_pr_text_gets_the_diff_of_the_text(self):
+        path = os.path.join(self.folder, "pr.md")
+        for text in ["feat: add a\n\nOld line.\n", "feat: add a\n\nNew line.\n"]:
+            with open(path, "w", encoding="utf-8") as file:
+                file.write(text)
+            self.review("writing-reviewer", "--pr-text", path, FAKE_OUTPUT=output([finding()]))
+        since = self.calls()[1]["request"].split("Changes since the last round:", 1)[1]
+        self.assertIn("-Old line.", since)
+        self.assertIn("+New line.", since)
+
+    def test_approval_and_reset_delete_the_last_round(self):
+        last = review_rounds(self.reviews("code-reviewer"), "feat/x") + ".last.json"
+        self.review("code-reviewer", FAKE_OUTPUT=output([finding()]))
+        self.assertTrue(os.path.exists(last))
+        self.assertEqual(self.review("code-reviewer").returncode, 0)
+        self.assertFalse(os.path.exists(last))
+        self.review("code-reviewer", FAKE_OUTPUT=output([finding()]))
+        self.assertEqual(self.review("code-reviewer", "--reset-rounds").returncode, 0)
+        self.assertFalse(os.path.exists(last))
+        self.review("code-reviewer")
+        self.assertNotIn("Changes since the last round:", self.calls()[-1]["request"])
+
+    def test_last_round_without_mode_and_value_is_an_error(self):
+        self.review("code-reviewer", FAKE_OUTPUT=output([finding()]))
+        for text in ['{"mode": "x", "value": "1"}', "[]"]:
+            with self.subTest(text=text):
+                with open(review_rounds(self.reviews("code-reviewer"), "feat/x") + ".last.json", "w") as file:
+                    file.write(text)
+                result = self.review("code-reviewer")
+                self.assertEqual(result.returncode, 2)
+                self.assertIn("has no mode and value", result.stderr)
+
+    def test_missing_tree_of_the_last_round_gives_no_changes_and_a_warning(self):
+        self.review("code-reviewer", FAKE_OUTPUT=output([finding()]))
+        with open(review_rounds(self.reviews("code-reviewer"), "feat/x") + ".last.json", "w") as file:
+            json.dump({"mode": "tree", "value": "0" * 40}, file)
+        result = self.review("code-reviewer")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("Cannot diff the tree of the last round", result.stderr)
+        self.assertNotIn("Changes since the last round:", self.calls()[-1]["request"])
+
+    def test_round_of_the_other_mode_gives_no_changes(self):
+        self.write("b.md", "Text.\n")
+        run(["add", "b.md"], self.repo)
+        self.review("writing-reviewer", FAKE_OUTPUT=output([finding()]))
+        path = os.path.join(self.folder, "pr.md")
+        with open(path, "w", encoding="utf-8") as file:
+            file.write("feat: add a\n\nText.\n")
+        self.review("writing-reviewer", "--pr-text", path)
+        self.assertNotIn("Changes since the last round:", self.calls()[-1]["request"])
+
+    def test_unreadable_last_round_is_an_error(self):
+        self.review("code-reviewer", FAKE_OUTPUT=output([finding()]))
+        with open(review_rounds(self.reviews("code-reviewer"), "feat/x") + ".last.json", "w") as file:
+            file.write("not json")
+        result = self.review("code-reviewer")
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("is not JSON", result.stderr)
+
     def test_review_from_a_subfolder_reviews_the_whole_change(self):
         os.makedirs(os.path.join(self.repo, "sub"))
         result = subprocess.run([sys.executable, SCRIPT, "code-reviewer"], cwd=os.path.join(self.repo, "sub"),
