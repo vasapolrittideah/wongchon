@@ -85,6 +85,14 @@ Each decision of this project that rejects options is an architecture decision r
 | Role files | Each review role is a role file in `reviewers/` with its model and effort. | [ADR-0027](docs/adrs/0027-keep-review-roles-in-role-files.md) |
 | Review guard | A separate hook blocks a commit or a PR without its stamps. | [ADR-0028](docs/adrs/0028-block-unstamped-commits-in-a-separate-hook.md) |
 | Self-review | The self-review uses `doubt-driven-development` with a `self-reviewer` subagent. | [ADR-0029](docs/adrs/0029-self-review-with-a-self-reviewer-subagent.md) |
+| Plan tasks | Version 1 tracks the tasks of a plan as GitHub Issues in a milestone for each change. | [ADR-0030](docs/adrs/0030-track-tasks-as-github-issues-in-a-milestone.md) |
+| Follow-up tasks | Each follow-up task is an Issue without a milestone, which the agent creates. | [ADR-0031](docs/adrs/0031-make-each-follow-up-task-an-issue-without-a-milestone.md) |
+| Build modes | The `build` skill builds 1 Issue at a time, in single or chain mode. | [ADR-0032](docs/adrs/0032-build-1-issue-at-a-time-in-single-or-chain-mode.md) |
+| Order of plan Issues | A script checks the order of the Issues of a plan in the skills and in the `Stage gate` job. | [ADR-0033](docs/adrs/0033-check-the-order-of-plan-issues-in-skills-and-the-stage-gate.md) |
+| Small change checks | A small change is a plan with the Spec line `None`, and a PR that changes an ADR links a spec. | [ADR-0034](docs/adrs/0034-detect-a-small-change-from-its-plan-and-its-related-artifacts.md) |
+| Subagent tools | `Check changes` checks the tools of each subagent against an allowlist. | [ADR-0035](docs/adrs/0035-check-the-tools-of-subagents-with-an-allowlist.md) |
+| Later review rounds | A later review round gets the diff since the last round, and a new problem outside that diff is a `Nit`, except a bug that loses data, opens a security hole, or crashes the program. | [ADR-0036](docs/adrs/0036-show-a-review-role-the-changes-since-its-last-round.md) |
+| Writing review of artifacts | The writing reviewer applies the convention of each artifact that it reviews. | [ADR-0037](docs/adrs/0037-make-the-writing-reviewer-apply-the-convention-of-each-artifact.md) |
 
 ## Phases
 
@@ -106,6 +114,7 @@ After version 1, the work continues with these items:
 - The deploy and maintain stages
 - Support for brownfield projects
 - Support for other agents, such as Codex
+- Task trackers other than GitHub, such as Jira, Monday.com, ClickUp, and GitLab
 - A separate GitHub identity for the agent, such as a bot account or a GitHub App
 - Vale rules that target projects can turn on
 
