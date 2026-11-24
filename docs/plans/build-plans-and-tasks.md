@@ -2,7 +2,7 @@
 
 Author: Vasapol Rittideah
 
-Status: `Draft`
+Status: `Approved`
 
 Spec: [`docs/specs/build-plans-and-tasks.md`](../specs/build-plans-and-tasks.md)
 
