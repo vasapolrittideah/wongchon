@@ -19,6 +19,9 @@ PR_TEXT_OPTIONS = {"-t", "--title", "-b", "--body", "-F", "--body-file", "-f", "
 PR_UNREADABLE = {"-b", "--body", "-f", "--fill", "--fill-first", "--fill-verbose", "-T", "--template", "-w", "--web",
                  "-e", "--editor"}
 GIT_VARIABLE = re.compile(r"^GIT_[A-Z_]*=")
+REDIRECTION = re.compile(r"\d*(>>|>&|>)")
+FD_TARGET = re.compile(r"\d+|-")
+FILE_TARGET = re.compile(r"[ \t]*[^\s;&|()<>`'\"$\\]+")
 PR_LONG_VALUES = {"--title", "--body", "--body-file", "--base", "--head", "--repo", "--label", "--assignee",
                   "--milestone", "--project", "--reviewer", "--template", "--add-label", "--remove-label",
                   "--add-assignee", "--remove-assignee", "--add-project", "--remove-project",
@@ -36,6 +39,50 @@ PR_TEXT = ("Pass the title with --title and the description with 1 --body-file, 
 PR_MISSING = ("The PR text has no approval stamp of {0}. Write the title on the first line of a file and the "
               "description after it, and run `python3 scripts/review.py {0} --pr-text <file>`. After it approves, "
               "pass the first line as --title and a file with only the description as --body-file.")
+
+
+def strip_redirections(text):
+    rows, ends, quote = [], [], None
+    for row in text.split("\n"):
+        if ends:
+            if row.lstrip("\t") == ends[0]:
+                ends.pop(0)
+            rows.append(row)
+            continue
+        row, quote = strip_row(row, quote)
+        rows.append(row)
+        if not quote:
+            ends = [m.group(2) for m in git_guard.HEREDOC.finditer(row) if row[m.start() - 1:m.start()] != "<"]
+    return "\n".join(rows)
+
+
+def strip_row(line, quote=None):
+    out, i = [], 0
+    while i < len(line):
+        char = line[i]
+        if quote:
+            if char == "\\" and quote == '"':
+                out.append(line[i:i + 2])
+                i += 2
+                continue
+            if char == quote:
+                quote = None
+        elif char in "'\"":
+            quote = char
+        elif char == "\\":
+            out.append(line[i:i + 2])
+            i += 2
+            continue
+        elif i == 0 or line[i - 1].isspace():
+            match = REDIRECTION.match(line, i)
+            target = match and (FD_TARGET if match.group(1) == ">&" else FILE_TARGET).match(line, match.end())
+            if target:
+                out.append(" ")
+                i = target.end()
+                continue
+        out.append(char)
+        i += 1
+    return "".join(out), quote
 
 
 def command_words(line):
@@ -142,6 +189,7 @@ def gh_pr(words):
 
 
 def decide(line, cwd):
+    line = strip_redirections(line)
     commands = []
     for words in git_guard.split_commands(line):
         names = [os.path.basename(word) for word in words]

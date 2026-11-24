@@ -148,9 +148,54 @@ class Guard(unittest.TestCase):
     def test_commit_with_a_redirect_or_a_heredoc_is_alone(self):
         self.stage("a.py")
         self.stamp("code-reviewer")
-        for line in ["git commit -m x > /tmp/log", "git commit -F - <<'EOF'\nfeat: add a\nEOF"]:
+        for line in ["git commit -m x > /tmp/log", "git commit -F - <<'EOF'\nfeat: add a\nEOF",
+                     "git commit -F msg 2>&1", "git commit -m x >> log.txt", "git commit -m x 2> err.txt",
+                     "git commit -m x >log 2>&1", "git commit -m 'a > b' 2>&1", "git commit -m x 2>&-",
+                     ">log git commit -m x", "2>/dev/null git commit -m x",
+                     "git commit -F - <<'EOF' 2>&1\nfeat: don't stop\nEOF", 'git commit -m "feat: x\n\nBody." 2>&1']:
             with self.subTest(line=line):
                 self.assertIsNone(self.decide(line))
+
+    def test_commit_with_a_redirection_and_another_command_is_blocked(self):
+        self.stage("a.py")
+        self.stamp("code-reviewer")
+        for line in ["git commit -m x 2>&1 | tail", "git commit -m x 2>&1; echo done", "git commit -m x > log && ls",
+                     "git commit -m x 2> err || ls", "git commit -m x > $(echo log)", "git commit -m x >`echo log`"]:
+            with self.subTest(line=line):
+                self.assertIn("only command", self.decide(line))
+
+    def test_commit_after_a_heredoc_still_needs_its_stamp(self):
+        self.stage("a.py")
+        for line in ["cat <<EOF\nx\nEOF\ngit commit -m x", "git commit -F - <<'EOF'\nmsg\nEOF\ngit commit -m y",
+                     "cat <<EOF 2>&1\ndon't\nEOF\ngit commit -m x 2>&1"]:
+            with self.subTest(line=line):
+                self.assertIsNotNone(self.decide(line))
+
+    def test_row_that_ends_inside_a_quote_starts_no_heredoc(self):
+        self.assertEqual(review_guard.strip_redirections('git commit -m "a <<EOF\nb" 2>&1'),
+                         'git commit -m "a <<EOF\nb"  ')
+
+    def test_backslash_in_single_quotes_is_literal(self):
+        self.assertEqual(review_guard.strip_redirections("echo 'a\\' 2>&1"), "echo 'a\\'  ")
+
+    def test_quoted_heredoc_marker_stays_blocked(self):
+        with self.assertRaises(ValueError):
+            self.decide('git commit -m "a <<EOF\nb" 2>&1')
+
+    def test_here_string_is_not_a_heredoc(self):
+        self.assertEqual(review_guard.strip_redirections("cat <<<EOF 2>&1\ngit commit -m x 2>&1"),
+                         "cat <<<EOF  \ngit commit -m x  ")
+
+    def test_heredoc_body_keeps_its_redirections(self):
+        line = "cat <<EOF\na 2>&1 b\nEOF\n"
+        self.assertEqual(review_guard.strip_redirections(line), line)
+
+    def test_redirection_without_a_target_or_in_a_word_stays(self):
+        for line, kept in [("git commit -m x 2>", "2>"), ("git commit -m a2>b", "a2>b"), ('echo "2>&1"', '"2>&1"'),
+                           ("git commit -m x 2>&y", "2>&y"), ('git commit -m "a \\" 2>&1"', '2>&1'),
+                           ("echo \\>x", "\\>x")]:
+            with self.subTest(line=line):
+                self.assertIn(kept, review_guard.strip_redirections(line))
 
     def test_other_git_commands_are_allowed(self):
         self.stage("a.py")
