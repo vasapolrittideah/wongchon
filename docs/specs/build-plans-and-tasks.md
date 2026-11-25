@@ -2,7 +2,7 @@
 
 Author: Vasapol Rittideah
 
-Status: `Approved`
+Status: `Draft`
 
 Intent: [`docs/intents/build-plans-and-tasks.md`](../intents/build-plans-and-tasks.md)
 
@@ -18,7 +18,7 @@ The review gate of [`docs/specs/plugin-review-gate.md`](plugin-review-gate.md) b
 2. Given a PR that changes an `Approved` plan, when the `Stage gate` job runs, then it runs the check of the Issues of the milestone of the plan. Criterion: S4. Proof: unit test.
 3. Given 2 open or closed Issues of 1 milestone whose Files sections share a path, when the check of the Issues runs, then it fails and names both Issues and the path, unless a chain of `Blocked by` links orders them. Criterion: S4. Proof: unit test with fake Issue data.
 4. Given an Issue of a milestone whose title has more than 72 characters, when the check of the Issues runs, then it fails and names the Issue. Criterion: S4. Proof: unit test.
-5. Given a plan with the Spec line `None` and more than 1 task, when the `Stage gate` job runs, then it fails. Criterion: S6. Proof: unit test.
+5. Given a plan with the Spec line `None` that has more than 1 task or links a milestone, when the `Stage gate` job runs, then it fails. Criterion: S6. Proof: unit test.
 6. Given a PR that changes `docs/adrs/**`, `ARCHITECTURE.md`, or `CONSTRAINTS.md`, when its Related artifacts section links no spec, then the `Stage gate` job fails. Criterion: S6. Proof: unit test.
 7. Given a bullet in Follow-up tasks that does not start with `#<number>: `, or Issue numbers out of ascending order, when the `PR metadata` job runs, then it fails and names the bullet. `n/a` passes. Criterion: S3. Proof: unit test.
 8. Given a file in `agents/` at the head of a PR whose `tools` field is missing or names a tool outside `Read`, `Grep`, `Glob`, `WebFetch`, and `WebSearch`, when the `Check changes` job runs, then it fails and names the file and the tool. Criterion: S7. Proof: unit test.
@@ -36,7 +36,7 @@ The review gate of [`docs/specs/plugin-review-gate.md`](plugin-review-gate.md) b
 
 ### Plan convention
 
-`docs/conventions/plans.md` defines `docs/plans/<change name>.md`, with the format of the plan of `plugin-review-gate`: a title `# Plan: <name>`, an Author line, a Status line of `Draft` or `Approved`, a Spec line, Tasks, Checkpoints, Risks with the columns Risk and Mitigation, and Open questions. Tasks is 1 sentence that names the milestone and the Project, and then 1 numbered link for each Issue in the order of the build. While the plan PR is a draft, each task is written in full, with the sections of an Issue, and the Issues replace them before the owner approves the plan. A small change has the Spec line `None` and 1 task, and the change has its plan and its code in 1 PR. The Template section of the convention is the plan template. Tracking stays in GitHub for version 1, as [ADR-0030](../adrs/0030-track-tasks-as-github-issues-in-a-milestone.md) states.
+`docs/conventions/plans.md` defines `docs/plans/<change name>.md`, with the format of the plan of `plugin-review-gate`: a title `# Plan: <name>`, an Author line, a Status line of `Draft` or `Approved`, a Spec line, Tasks, Checkpoints, Risks with the columns Risk and Mitigation, and Open questions. Tasks starts with 1 sentence that names the Project and, for a change with a spec, the milestone. It then lists 1 numbered link for each Issue in the order of the build. While the plan PR is a draft, each task is written in full, with the sections of an Issue, and the Issues replace them before the owner approves the plan. A small change has the Spec line `None` and 1 task, and the change has its plan and its code in 1 PR. The Template section of the convention is the plan template. Tracking stays in GitHub for version 1, as [ADR-0038](../adrs/0038-give-a-milestone-only-to-a-change-with-a-spec.md) states.
 
 ### GitHub Issue convention
 
@@ -48,7 +48,7 @@ The review gate of [`docs/specs/plugin-review-gate.md`](plugin-review-gate.md) b
 | Task Issue body | A `Plan:` line with the link of the plan on `main`, then Result, Requirements, Files, Proof, and Owner action. Files lists 1 path in backticks in each bullet, with ` (new)` after a path that the task creates. Proof is a checklist that ends with "Review the CI results on the PR." |
 | Follow-up Issue body | A `Source:` line with the link of the PR, then Result and Why. It has no milestone, as [ADR-0031](../adrs/0031-make-each-follow-up-task-an-issue-without-a-milestone.md) states. |
 | Labels | The labels of the PR of the task, as the GitHub label conventions state |
-| Milestone | 1 for each change, named after the change, with the link of the plan on `main` as its description |
+| Milestone | 1 for each change with a spec, named after the change, with the link of the plan on `main` as its description. The Issue of a small change has no milestone, as [ADR-0038](../adrs/0038-give-a-milestone-only-to-a-change-with-a-spec.md) states. |
 | Order | `Blocked by` links of GitHub only, from each Issue that shares a file with an earlier Issue |
 | Project | Each Issue joins the Project of `github.project` in `.wongchon/config.json`, with the statuses `Todo`, `In Progress`, and `Done`. Without that key, the skills skip the Project. |
 
@@ -95,7 +95,7 @@ At the start of each change, the `intent` skill lists the open Issues without a 
 
 ### Stage gate
 
-`scripts/check_stage_gate.py` reads `docs/plans/` with intents and specs. For each changed plan that is `Approved`, it runs the check of the plan Issues on the milestone of the plan. For a plan with the Spec line `None`, it fails when the plan has more than 1 task. It takes the PR body from `PR_BODY`, and fails when the PR changes `docs/adrs/**`, `ARCHITECTURE.md`, or `CONSTRAINTS.md` and Related artifacts links no spec, as [ADR-0034](../adrs/0034-detect-a-small-change-from-its-plan-and-its-related-artifacts.md) states. The `Stage gate` job gets `issues: read`, `GH_TOKEN`, and `PR_BODY`.
+`scripts/check_stage_gate.py` reads `docs/plans/` with intents and specs. For each changed plan that is `Approved`, it runs the check of the plan Issues on the milestone of the plan. For a plan with the Spec line `None`, it fails when the plan has more than 1 task or links a milestone. It takes the PR body from `PR_BODY`, and fails when the PR changes `docs/adrs/**`, `ARCHITECTURE.md`, or `CONSTRAINTS.md` and Related artifacts links no spec, as [ADR-0034](../adrs/0034-detect-a-small-change-from-its-plan-and-its-related-artifacts.md) states. The `Stage gate` job gets `issues: read`, `GH_TOKEN`, and `PR_BODY`.
 
 ### Check changes
 
@@ -131,7 +131,7 @@ When a review ends without an approval, `scripts/review.py` saves its tree, or i
 
 | Decision | ADR |
 | --- | --- |
-| Version 1 tracks the tasks of a plan as GitHub Issues in a milestone for each change. | [ADR-0030](../adrs/0030-track-tasks-as-github-issues-in-a-milestone.md) |
+| Superseded by ADR-0038. | [ADR-0030](../adrs/0030-track-tasks-as-github-issues-in-a-milestone.md) |
 | Each follow-up task is an Issue without a milestone, which the agent creates. | [ADR-0031](../adrs/0031-make-each-follow-up-task-an-issue-without-a-milestone.md) |
 | The `build` skill builds 1 Issue at a time, in single or chain mode. | [ADR-0032](../adrs/0032-build-1-issue-at-a-time-in-single-or-chain-mode.md) |
 | A script checks the order of the Issues of a plan in the skills and in the `Stage gate` job. | [ADR-0033](../adrs/0033-check-the-order-of-plan-issues-in-skills-and-the-stage-gate.md) |
@@ -139,6 +139,7 @@ When a review ends without an approval, `scripts/review.py` saves its tree, or i
 | `Check changes` checks the tools of each subagent against an allowlist. | [ADR-0035](../adrs/0035-check-the-tools-of-subagents-with-an-allowlist.md) |
 | A later review round gets the diff since the last round, and a new problem outside that diff is a `Nit`, except a bug that loses data, opens a security hole, or crashes the program. | [ADR-0036](../adrs/0036-show-a-review-role-the-changes-since-its-last-round.md) |
 | The writing reviewer applies the convention of each artifact that it reviews. | [ADR-0037](../adrs/0037-make-the-writing-reviewer-apply-the-convention-of-each-artifact.md) |
+| Version 1 tracks the tasks of a plan as GitHub Issues, with a milestone only for a change with a spec. | [ADR-0038](../adrs/0038-give-a-milestone-only-to-a-change-with-a-spec.md) |
 
 ## Concerns
 
@@ -174,6 +175,7 @@ When a review ends without an approval, `scripts/review.py` saves its tree, or i
 | What counts as a follow-up task, and what does the check read? | Only work that no plan or Issue holds. The check reads only the form `#<number>: ` and the order of the bullets. |
 | What do the `plan` and `build` skills and the 3 copied skills do? | As the Plan skill, Build skill, and Copied skills parts state. Chain mode waits for each merge before the next Issue. |
 | How are `2>&1`, Issue titles, the triage, the configuration, and the glossary handled? | Redirections pass and pipes and lists still block, the check of the Issues checks the length of each title, the `intent` skill triages open follow-up Issues of its area, the Project is in `github.project`, and the glossary gets the new terms. |
+| Does a small change need a milestone? | No. A milestone shows the progress of a change across its tasks, and a milestone with 1 Issue shows only the state of that Issue. Each small change would add 1 more milestone. The `Stage gate` job fails on the plan of a small change that links a milestone. |
 
 ## References
 
