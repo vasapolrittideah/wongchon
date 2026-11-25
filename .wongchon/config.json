@@ -82,5 +82,11 @@
         "paths": []
       }
     ]
+  },
+  "github": {
+    "project": {
+      "owner": "vasapolrittideah",
+      "number": 5
+    }
   }
 }
