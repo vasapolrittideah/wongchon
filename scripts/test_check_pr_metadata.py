@@ -70,12 +70,22 @@ class Titles(unittest.TestCase):
     def test_description_must_not_end_with_period(self):
         self.assert_fails(["feat: add a CI gate."], "ends with a period")
 
-    def test_description_must_be_plain_text(self):
+    def test_description_must_have_no_link_or_url(self):
         self.assert_fails([
-            "feat: add the `check_pr_title.py` script",
             "docs: link the [playbook](https://example.com)",
             "docs: link https://example.com in the roadmap",
-        ], "Write plain text")
+        ], "Markdown link or a URL")
+
+    def test_description_can_have_code_in_backticks(self):
+        self.assertEqual(check_pr_metadata.check_title("feat: add the `check_pr_title.py` script", TYPES, SCOPES), [])
+
+    def test_url_and_link_marks_inside_backticks_pass(self):
+        for title in ["fix: parse the `scheme://` prefix in the config", "fix: escape `](` in the parser"]:
+            with self.subTest(title=title):
+                self.assertEqual(check_pr_metadata.check_title(title, TYPES, SCOPES), [])
+
+    def test_unclosed_backtick_fails(self):
+        self.assert_fails(["feat: add the `check_pr_title.py script"], "without its closing backtick")
 
     def test_long_title_fails(self):
         self.assert_fails(["docs: " + "a" * 67], "more than 72")

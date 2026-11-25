@@ -88,11 +88,13 @@ Co-authored-by: <co-author name, if any> <<co-author email>>
 
 ### Format and content
 
-- Write the whole message as plain text, including text that comes from a PR description. Do not use backticks, Markdown links, or URLs. Name a file by its path, and refer to an Issue or a PR by its number, such as `#123`.
+- In the whole message, put code, identifiers, file paths, commands, and change names in backticks, so that GitHub renders them in the PR title and in the changelog.
+- Refer to an Issue or a PR by its number, such as `#123`.
 - Keep the whole subject line at most 72 characters. Do not count the `(#<number>)` suffix and its leading space, which GitHub adds to a squash commit.
 - Write the parts in the order of the [Template](#template).
 - Choose the type and the scope from the main change, which is the change that the commit or the PR exists to make. An edit that only supports the main change is not part of it, such as a new row in a table of links or a status update in a roadmap.
 - Follow [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/).
+- Do not use Markdown links, URLs, or Markdown formats other than backticks, such as bold text or headings. This rule also covers text that comes from a PR description.
 - Do not split code or trailers. A line that holds one of them can be longer than 72 characters.
 
 ### Workflow
@@ -168,7 +170,7 @@ ci: check pull request titles
 This subject has a breaking marker, because users must move their settings to a new file:
 
 ```text
-feat!: read commit scopes from .wongchon/config.json
+feat!: read commit scopes from `.wongchon/config.json`
 ```
 
 This subject reverts an earlier commit with its scope and description:
@@ -198,7 +200,7 @@ feat(verify): stop the eval run when a sample project fails to build
 
 The eval runner reads the exit code of the build command of each
 sample project and stops before the test step when the code is not 0.
-test_runner_stops_on_build_failure covers a sample with a broken
+`test_runner_stops_on_build_failure` covers a sample with a broken
 build.
 
 Refs: #42
