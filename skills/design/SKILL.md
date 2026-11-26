@@ -76,6 +76,7 @@ Before you commit the spec, make sure that each item is true:
 - [ ] The spec has each section of the template of the spec convention, in the template order. Decisions, Answers to the intent, and References are present only when they have content, as the spec convention states.
 - [ ] The spec has at most 200 lines, blank lines included.
 - [ ] The status is `Draft` until the owner approves the spec.
+- [ ] The requirements are a table with the columns ID, Requirement, Criterion, and Proof, and each ID has the form `R<number>`.
 - [ ] Each success criterion of the intent has at least 1 requirement, and each requirement names its criterion ID and a test level.
 - [ ] A requirement names each existing behavior that must not change.
 - [ ] Each Design subsection states the contract of its part, and links the ADR of each decision that rejects options.

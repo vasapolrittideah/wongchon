@@ -91,14 +91,16 @@ Don't silently fill in ambiguous requirements. The spec's entire purpose is to s
 - **Commands, project structure, code style, and testing strategy** — They apply to the whole project, so `AGENTS.md`, `ARCHITECTURE.md`, and `CONSTRAINTS.md` state them. If the change changes one of them, the spec states the change.
 - **Boundaries** — The spec has `Ask first` and `Never` items for the build of this change only. The rules that always apply are in `AGENTS.md` and `CONSTRAINTS.md`.
 
-**Turn each success criterion into requirements.** Write each requirement in the form Given, when, then, so that a test can prove it:
+**Turn each success criterion into requirements.** Write each requirement as 1 row of the Requirements table, with an ID such as `R1`. Use the form Given, when, then, so that a test can prove it:
 
 ```
 SUCCESS CRITERION S1: "Users see their dashboard without a wait"
 
 REQUIREMENTS:
-1. Given a signed-in user on a 4G connection, when they open the dashboard, then its LCP is below 2.5s. Criterion: S1. Proof: end-to-end test.
-2. Given the dashboard data, when the page loads, then the initial data load completes in < 500ms. Criterion: S1. Proof: integration test.
+| ID | Requirement | Criterion | Proof |
+| --- | --- | --- | --- |
+| R1 | Given a signed-in user on a 4G connection, when they open the dashboard, then its LCP is below 2.5s. | S1 | End-to-end test |
+| R2 | Given the dashboard data, when the page loads, then the initial data load completes in < 500ms. | S1 | Integration test |
 → Are these the right targets?
 ```
 
@@ -163,7 +165,7 @@ A spec describes one change. New ideas and later changes don't expand it — the
 Before the build stage starts, confirm:
 
 - [ ] The spec follows the template and the rules of the [spec convention](../../docs/conventions/specs.md), and has at most 200 lines
-- [ ] Each success criterion of the intent has at least 1 requirement, and each requirement names a test level
+- [ ] Each success criterion of the intent has at least 1 requirement, and each requirement has an ID and names a test level
 - [ ] Each decision that rejects options has an ADR in the same pull request
 - [ ] The owner has reviewed and approved the spec
 - [ ] The turn ended after saving the spec; approval came in a later turn
