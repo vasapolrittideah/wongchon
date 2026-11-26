@@ -2,7 +2,7 @@
 
 Author: Vasapol Rittideah
 
-Status: `Approved`
+Status: `Draft`
 
 Intent: [`docs/intents/build-plans-and-tasks.md`](../intents/build-plans-and-tasks.md)
 
@@ -14,23 +14,25 @@ The review gate of [`docs/specs/plugin-review-gate.md`](plugin-review-gate.md) b
 
 ## Requirements
 
-1. Given a plan whose status is not `Approved`, when the `Stage gate` job runs on a PR that changes it, then the job fails and names the plan. Criterion: S5. Proof: unit test.
-2. Given a PR that changes an `Approved` plan, when the `Stage gate` job runs, then it runs the check of the Issues of the milestone of the plan. Criterion: S4. Proof: unit test.
-3. Given 2 open or closed Issues of 1 milestone whose Files sections share a path, when the check of the Issues runs, then it fails and names both Issues and the path, unless a chain of `Blocked by` links orders them. Criterion: S4. Proof: unit test with fake Issue data.
-4. Given an Issue of a milestone whose title has more than 72 characters, when the check of the Issues runs, then it fails and names the Issue. Criterion: S4. Proof: unit test.
-5. Given a plan with the Spec line `None` that has more than 1 task or links a milestone, when the `Stage gate` job runs, then it fails. Criterion: S6. Proof: unit test.
-6. Given a PR that changes `docs/adrs/**`, `ARCHITECTURE.md`, or `CONSTRAINTS.md`, when its Related artifacts section links no spec, then the `Stage gate` job fails. Criterion: S6. Proof: unit test.
-7. Given a bullet in Follow-up tasks that does not start with `#<number>: `, or Issue numbers out of ascending order, when the `PR metadata` job runs, then it fails and names the bullet. `n/a` passes. Criterion: S3. Proof: unit test.
-8. Given a file in `agents/` at the head of a PR whose `tools` field is missing or names a tool outside `Read`, `Grep`, `Glob`, `WebFetch`, and `WebSearch`, when the `Check changes` job runs, then it fails and names the file and the tool. Criterion: S7. Proof: unit test.
-9. Given a changed file in `agents/`, when the `Check changes` job runs, then it shows a warning for the file. Criterion: S7. Proof: unit test.
-10. Given `git commit` with `2>&1`, `> <file>`, `>> <file>`, or `2> <file>` and the stamps of its roles, when the review guard runs, then it allows the command. Given a pipe, `;`, `&&`, or `||` after `git commit`, then it still blocks the command. Criterion: S8. Proof: unit test.
-11. Given a review that ends without an approval, when the same role reviews the same branch again, then the request holds the diff from the tree or the PR text of the last round to the current one, and the findings and replies of the last round. Criterion: S10. Proof: unit test with a fake reviewer command.
-12. Given a later round, when a role finds a new problem in text outside the diff since the last round, then it reports the problem as `Nit`, except a bug in code that loses data, opens a security hole, or crashes the program. Criterion: S10. Proof: manual check of the review rounds of this change.
-13. Given a staged stage artifact, when the writing reviewer reviews it, then it reads the convention of the artifact and reports no finding whose fix breaks that convention. Criterion: S9. Proof: manual check of the review rounds of this change.
-14. Given the follow-up tasks of the PRs that merged before this change, when the sweep ends, then each one has an Issue or a reason to close it in a table that the maintainer approved. Criterion: S2. Proof: manual check by the maintainer.
-15. Given the change `plugin-skeleton-and-setup`, when its last PR merges, then its plan came from the `plan` skill and each of its Issues from the `build` skill, without an edit of the skills or conventions of this change. Criterion: S1. Proof: manual check by the maintainer.
-16. Given the last PR of this change, when it merges, then the maintainer checks requirement 13 of the spec of `plugin-review-gate` for each commit and each PR of this change. Criterion: S9. Proof: manual check by the maintainer.
-17. Given the existing tests, the commands that the Git guard and the review guard block, and the protected jobs, when this change merges, then each one keeps working, and a review of 1 round still gets no diff since a last round. Criterion: S8. Proof: unit test and CI.
+| ID | Requirement | Criterion | Proof |
+| --- | --- | --- | --- |
+| R1 | Given a plan whose status is not `Approved`, when the `Stage gate` job runs on a PR that changes it, then the job fails and names the plan. | S5 | Unit test |
+| R2 | Given a PR that changes an `Approved` plan, when the `Stage gate` job runs, then it runs the check of the Issues of the milestone of the plan. | S4 | Unit test |
+| R3 | Given 2 open or closed Issues of 1 milestone whose Files sections share a path, when the check of the Issues runs, then it fails and names both Issues and the path, unless a chain of `Blocked by` links orders them. | S4 | Unit test with fake Issue data |
+| R4 | Given an Issue of a milestone whose title has more than 72 characters, when the check of the Issues runs, then it fails and names the Issue. | S4 | Unit test |
+| R5 | Given a plan with the Spec line `None` that has more than 1 task or links a milestone, when the `Stage gate` job runs, then it fails. | S6 | Unit test |
+| R6 | Given a PR that changes `docs/adrs/**`, `ARCHITECTURE.md`, or `CONSTRAINTS.md`, when its Related artifacts section links no spec, then the `Stage gate` job fails. | S6 | Unit test |
+| R7 | Given a bullet in Follow-up tasks that does not start with `#<number>: `, or Issue numbers out of ascending order, when the `PR metadata` job runs, then it fails and names the bullet. `n/a` passes. | S3 | Unit test |
+| R8 | Given a file in `agents/` at the head of a PR whose `tools` field is missing or names a tool outside `Read`, `Grep`, `Glob`, `WebFetch`, and `WebSearch`, when the `Check changes` job runs, then it fails and names the file and the tool. | S7 | Unit test |
+| R9 | Given a changed file in `agents/`, when the `Check changes` job runs, then it shows a warning for the file. | S7 | Unit test |
+| R10 | Given `git commit` with `2>&1`, `> <file>`, `>> <file>`, or `2> <file>` and the stamps of its roles, when the review guard runs, then it allows the command. Given a pipe, `;`, `&&`, or `\|\|` after `git commit`, then it still blocks the command. | S8 | Unit test |
+| R11 | Given a review that ends without an approval, when the same role reviews the same branch again, then the request holds the diff from the tree or the PR text of the last round to the current one, and the findings and replies of the last round. | S10 | Unit test with a fake reviewer command |
+| R12 | Given a later round, when a role finds a new problem in text outside the diff since the last round, then it reports the problem as `Nit`, except a bug in code that loses data, opens a security hole, or crashes the program. | S10 | Manual check of the review rounds of this change |
+| R13 | Given a staged stage artifact, when the writing reviewer reviews it, then it reads the convention of the artifact and reports no finding whose fix breaks that convention. | S9 | Manual check of the review rounds of this change |
+| R14 | Given the follow-up tasks of the PRs that merged before this change, when the sweep ends, then each one has an Issue or a reason to close it in a table that the maintainer approved. | S2 | Manual check by the maintainer |
+| R15 | Given the change `plugin-skeleton-and-setup`, when its last PR merges, then its plan came from the `plan` skill and each of its Issues from the `build` skill, without an edit of the skills or conventions of this change. | S1 | Manual check by the maintainer |
+| R16 | Given the last PR of this change, when it merges, then the maintainer checks R13 of the spec of `plugin-review-gate` for each commit and each PR of this change. | S9 | Manual check by the maintainer |
+| R17 | Given the existing tests, the commands that the Git guard and the review guard block, and the protected jobs, when this change merges, then each one keeps working, and a review of 1 round still gets no diff since a last round. | S8 | Unit test and CI |
 
 ## Design
 
@@ -99,7 +101,7 @@ At the start of each change, the `intent` skill lists the open Issues without a 
 
 ### Check changes
 
-`scripts/check_changes.py` adds `agents/` to the paths that it warns about. It reads each file of `agents/` at the head of the PR, and fails when the `tools` field is missing or names a tool outside the allowlist of requirement 8, as [ADR-0035](../adrs/0035-check-the-tools-of-subagents-with-an-allowlist.md) states.
+`scripts/check_changes.py` adds `agents/` to the paths that it warns about. It reads each file of `agents/` at the head of the PR, and fails when the `tools` field is missing or names a tool outside the allowlist of R8, as [ADR-0035](../adrs/0035-check-the-tools-of-subagents-with-an-allowlist.md) states.
 
 ### Review guard
 
@@ -107,7 +109,7 @@ At the start of each change, the `intent` skill lists the open Issues without a 
 
 ### Review rounds
 
-When a review ends without an approval, `scripts/review.py` saves its tree, or its PR text, next to the count of rounds. The next round adds the diff from that tree or text to the current one, after the findings and replies of the last round. An approval or `--reset-rounds` deletes the saved tree or text with the count. Each role file states the rule of requirement 12, and the agent fixes each `Nit` of a later round or creates a follow-up Issue for it, as [ADR-0036](../adrs/0036-show-a-review-role-the-changes-since-its-last-round.md) states.
+When a review ends without an approval, `scripts/review.py` saves its tree, or its PR text, next to the count of rounds. The next round adds the diff from that tree or text to the current one, after the findings and replies of the last round. An approval or `--reset-rounds` deletes the saved tree or text with the count. Each role file states the rule of R12, and the agent fixes each `Nit` of a later round or creates a follow-up Issue for it, as [ADR-0036](../adrs/0036-show-a-review-role-the-changes-since-its-last-round.md) states.
 
 ### Writing reviewer
 

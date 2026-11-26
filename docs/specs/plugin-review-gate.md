@@ -2,7 +2,7 @@
 
 Author: Vasapol Rittideah
 
-Status: `Approved`
+Status: `Draft`
 
 Intent: [`docs/intents/plugin-review-gate.md`](../intents/plugin-review-gate.md)
 
@@ -14,20 +14,22 @@ The [Review gate](../adrs/0010-run-review-roles-in-a-review-script.md) decision 
 
 ## Requirements
 
-1. Given staged files that match the paths of a role, when the agent runs `git commit` and no approval stamp of that role exists for the staged tree, then the hook blocks the command and names the role and the command that reviews the change. Criterion: S2. Proof: unit test.
-2. Given an approval stamp of each required role for the staged tree, when the agent runs `git commit`, then the hook allows it. Criterion: S2. Proof: unit test.
-3. Given a `git commit` with `-a`, `-i`, `-o`, or a path, or a staged tree that the hook cannot compute, or a stamp that it cannot read, when the hook runs, then it blocks the command. Criterion: S2. Proof: unit test.
-4. Given `gh pr create` or `gh pr edit` that changes the title or the body, when no writing reviewer stamp exists for the hash of the title and the body file, or the command uses `--body` instead of 1 `--body-file`, then the hook blocks it. Criterion: S2. Proof: unit test.
-5. Given a commit whose staged tree equals the tree of `HEAD`, such as a change of the message only, when the agent runs `git commit`, then the hook allows it. Criterion: S2. Proof: unit test.
-6. Given a review, when the structured output of the role has no `Important` finding, then the script writes the stamp. When it has an `Important` finding, or the output is missing or does not match the schema, then the script writes no stamp and exits with a failure. Criterion: S2. Proof: unit test with a fake reviewer command.
-7. Given a review role that tries to edit a file or to write a stamp, when the review runs, then no file of the project and no stamp changes. Criterion: S6. Proof: integration test with the real reviewer command.
-8. Given 3 reviews of a role on a branch without an approval, when the agent starts a fourth review, then the script refuses it and tells the agent to ask the maintainer. After an approval, the count of that role starts again. Criterion: S3. Proof: unit test.
-9. Given a command of the agent that resets the count of rounds, when the Git guard runs, then it blocks the command. Criterion: S3. Proof: unit test.
-10. Given a PR that changes the check scripts or the workflow of `PR metadata` or `Stage gate`, when CI runs, then these jobs run the workflow and the scripts of `main`. Criterion: S4. Proof: manual check on a test PR.
-11. Given a PR whose workflows define a job with the name of a protected job, when the `Check changes` job runs, then it fails and names the job. Criterion: S4. Proof: unit test.
-12. Given a PR that changes `.github/workflows/**`, `scripts/**`, `hooks/**`, `reviewers/**`, or `.claude/settings.json`, when the `Check changes` job runs, then it shows a warning for each changed file of these paths. Criterion: S5. Proof: unit test and manual check on a test PR.
-13. Given the change `build-plans-and-tasks`, when its last PR merges, then each of its commits and PRs had the stamps of its roles, and the maintainer wrote no review comment that a role should have found. Criterion: S1. Proof: manual check by the maintainer.
-14. Given the existing tests of `hooks/` and `scripts/`, the commands that `hooks/git_guard.py` blocks, and the jobs `Checks (Python 3.9)` and `Checks (Python 3.x)`, when this change merges, then each one keeps working. Criterion: S2. Proof: unit test and CI.
+| ID | Requirement | Criterion | Proof |
+| --- | --- | --- | --- |
+| R1 | Given staged files that match the paths of a role, when the agent runs `git commit` and no approval stamp of that role exists for the staged tree, then the hook blocks the command and names the role and the command that reviews the change. | S2 | Unit test |
+| R2 | Given an approval stamp of each required role for the staged tree, when the agent runs `git commit`, then the hook allows it. | S2 | Unit test |
+| R3 | Given a `git commit` with `-a`, `-i`, `-o`, or a path, or a staged tree that the hook cannot compute, or a stamp that it cannot read, when the hook runs, then it blocks the command. | S2 | Unit test |
+| R4 | Given `gh pr create` or `gh pr edit` that changes the title or the body, when no writing reviewer stamp exists for the hash of the title and the body file, or the command uses `--body` instead of 1 `--body-file`, then the hook blocks it. | S2 | Unit test |
+| R5 | Given a commit whose staged tree equals the tree of `HEAD`, such as a change of the message only, when the agent runs `git commit`, then the hook allows it. | S2 | Unit test |
+| R6 | Given a review, when the structured output of the role has no `Important` finding, then the script writes the stamp. When it has an `Important` finding, or the output is missing or does not match the schema, then the script writes no stamp and exits with a failure. | S2 | Unit test with a fake reviewer command |
+| R7 | Given a review role that tries to edit a file or to write a stamp, when the review runs, then no file of the project and no stamp changes. | S6 | Integration test with the real reviewer command |
+| R8 | Given 3 reviews of a role on a branch without an approval, when the agent starts a fourth review, then the script refuses it and tells the agent to ask the maintainer. After an approval, the count of that role starts again. | S3 | Unit test |
+| R9 | Given a command of the agent that resets the count of rounds, when the Git guard runs, then it blocks the command. | S3 | Unit test |
+| R10 | Given a PR that changes the check scripts or the workflow of `PR metadata` or `Stage gate`, when CI runs, then these jobs run the workflow and the scripts of `main`. | S4 | Manual check on a test PR |
+| R11 | Given a PR whose workflows define a job with the name of a protected job, when the `Check changes` job runs, then it fails and names the job. | S4 | Unit test |
+| R12 | Given a PR that changes `.github/workflows/**`, `scripts/**`, `hooks/**`, `reviewers/**`, or `.claude/settings.json`, when the `Check changes` job runs, then it shows a warning for each changed file of these paths. | S5 | Unit test and manual check on a test PR |
+| R13 | Given the change `build-plans-and-tasks`, when its last PR merges, then each of its commits and PRs had the stamps of its roles, and the maintainer wrote no review comment that a role should have found. | S1 | Manual check by the maintainer |
+| R14 | Given the existing tests of `hooks/` and `scripts/`, the commands that `hooks/git_guard.py` blocks, and the jobs `Checks (Python 3.9)` and `Checks (Python 3.x)`, when this change merges, then each one keeps working. | S2 | Unit test and CI |
 
 ## Design
 
@@ -61,7 +63,7 @@ The script counts the reviews of each role that end without an approval in `<git
 
 ### Review guard hook
 
-`hooks/review_guard.py` is a `PreToolUse` hook for `Bash` in `.claude/settings.json`, apart from the Git guard, as [ADR-0028](../adrs/0028-block-unstamped-commits-in-a-separate-hook.md) states. It uses the command parser of `hooks/git_guard.py`, and the path rules and the stamp names of `scripts/review.py`. It checks `git commit`, `gh pr create`, and `gh pr edit`, as requirements 1 to 5 state, and it reads each stamp to confirm the role and the key. Each error blocks the command with exit code `2` and a message that names the missing stamp. It does not check `git push`, because each commit already has its stamps.
+`hooks/review_guard.py` is a `PreToolUse` hook for `Bash` in `.claude/settings.json`, apart from the Git guard, as [ADR-0028](../adrs/0028-block-unstamped-commits-in-a-separate-hook.md) states. It uses the command parser of `hooks/git_guard.py`, and the path rules and the stamp names of `scripts/review.py`. It checks `git commit`, `gh pr create`, and `gh pr edit`, as R1 to R5 state, and it reads each stamp to confirm the role and the key. Each error blocks the command with exit code `2` and a message that names the missing stamp. It does not check `git push`, because each commit already has its stamps.
 
 ### Protected checks
 
@@ -71,7 +73,7 @@ The script counts the reviews of each role that end without an approval in `<git
 | --- | --- |
 | `PR metadata` | Runs `scripts/check_pr_metadata.py` of `main` on the title and the body of the event |
 | `Stage gate` | Runs `scripts/check_stage_gate.py --head <PR head SHA>` of `main`, which reads each changed artifact from that commit |
-| `Check changes` | Writes a warning annotation for each changed file of the paths of requirement 12, and fails when a workflow of the PR defines a job named `PR metadata`, `Stage gate`, or `Check changes` |
+| `Check changes` | Writes a warning annotation for each changed file of the paths of R12, and fails when a workflow of the PR defines a job named `PR metadata`, `Stage gate`, or `Check changes` |
 
 `ci.yml` keeps the jobs `Checks (Python 3.9)` and `Checks (Python 3.x)` on `pull_request`, because they run the code of the PR.
 
@@ -129,7 +131,7 @@ The `intent` and `design` skills name `researcher` in their research steps.
 
 ## Assumptions and open questions
 
-- `--safe-mode` keeps the hooks of installed plugins off in print mode, as the CLI reference states. A test on 2026-11-23 proved it only for the hooks of a project. The integration test of requirement 7 proves it.
+- `--safe-mode` keeps the hooks of installed plugins off in print mode, as the CLI reference states. A test on 2026-11-23 proved it only for the hooks of a project. The integration test of R7 proves it.
 - When 2 check runs on 1 commit have the same name, GitHub does not document which one a required check uses. `Check changes` makes such a PR fail, but the maintainer must read its result.
 
 ## Answers to the intent
