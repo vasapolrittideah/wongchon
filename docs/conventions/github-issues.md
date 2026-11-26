@@ -97,13 +97,14 @@ An Issue has a [Title](#title), a [Source line](#source-line), a [Result](#resul
 
 - Create the task Issues of a plan after the owner agrees with the tasks, and before the plan becomes `Approved`, as the plan conventions state.
 - Create a follow-up Issue for each piece of work that a PR leaves for later and that no plan holds, without a question to the owner first. Do not create an Issue for a step of the next stage, such as the spec after an intent.
-- At the start of each change, list the open Issues without a milestone that have the area label of the scope of the change. The owner decides each one: join the change, wait, or close it.
+- At the start of each change, list the open Issues without a milestone that have the area label of the scope of the change. The owner decides each one: join the change, wait, or close it. The open Issue of a small change can be in the list while its PR is open, and the owner can decide to wait on it.
 - When a follow-up Issue joins a change, give it the milestone of the change, and add the sections of a task Issue to its body.
 
 ### Links and tracking
 
 - Apply the labels that the PR of the task will have, as the [GitHub label](github-labels.md) conventions state.
-- Give each task Issue the milestone of its change. Name the milestone after the change, and write `Plan: <link to the plan on main>` as its description.
+- Give each task Issue of a change with a spec the milestone of its change. Name the milestone after the change, and write `Plan: <link to the plan on main>` as its description.
+- Give the task Issue of a small change no milestone, because a milestone of 1 Issue shows only the state of that Issue.
 - Give a follow-up Issue no milestone.
 - If 2 Issues of a milestone change or create the same file, add a `Blocked by` link from the later Issue to the earlier one, with `gh issue edit <number> --add-blocked-by <number>`. Do not write the order of Issues in their bodies.
 - If `github.project` in `.wongchon/config.json` names a Project, add each Issue to it with the status `Todo`. Set the status `In Progress` when the build of the Issue starts. If the Project does not move the Issue to `Done` when it closes, set the status `Done`.

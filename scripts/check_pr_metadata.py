@@ -11,7 +11,7 @@ CONFIG = os.path.join(".wongchon", "config.json")
 MAX_LENGTH = 72
 SUBJECT = re.compile(r"^(?P<type>[^\s():!]+)(?:\((?P<scope>[^()]*)\))?(?P<breaking>!)?: (?P<description>\S.*)$")
 TYPE_ROW = re.compile(r"^\|\s*`([^`]+)`\s*\|")
-MARKUP = re.compile(r"`|\]\(|://")
+LINK = re.compile(r"\]\(|://")
 FENCE = re.compile(r"^\s*(```|~~~)")
 INLINE_CODE = re.compile(r"`[^`]*`")
 ARTIFACT = re.compile(r"^- \[`(?P<path>[^`\s]+)`\]\(https://github\.com/[^/\s]+/[^/\s]+/blob/main/(?P=path)\)$")
@@ -88,8 +88,10 @@ def check_title(title, types, scopes):
         findings.append("the description does not start with a lowercase letter")
     if description.endswith("."):
         findings.append("the description ends with a period")
-    if MARKUP.search(description):
-        findings.append("the description has a backtick, a Markdown link, or a URL. Write plain text")
+    if LINK.search(INLINE_CODE.sub("", description)):
+        findings.append("the description has a Markdown link or a URL. Refer to an Issue or a PR by its number")
+    if description.count("`") % 2:
+        findings.append("the description has a backtick without its closing backtick")
     if len(title) > MAX_LENGTH:
         findings.append("the title has {0} characters, more than {1}".format(len(title), MAX_LENGTH))
     return findings
