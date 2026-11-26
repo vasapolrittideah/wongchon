@@ -8,7 +8,7 @@ Spec: None
 
 ## Tasks
 
-Tasks are tracked in the [wongchon](https://github.com/users/vasapolrittideah/projects/5) GitHub Project under the [backticks-in-commit-messages](https://github.com/vasapolrittideah/wongchon/milestone/3) milestone. This small change is 1 task and 1 PR. The PR holds this plan and its code. The Issue states its result, files, proof, and owner action.
+Tasks are tracked in the [wongchon](https://github.com/users/vasapolrittideah/projects/5) GitHub Project. This small change is 1 task and 1 PR. The PR holds this plan and its code. The Issue states its result, files, proof, and owner action.
 
 1. [#71 Allow backticks in commit messages and PR titles](https://github.com/vasapolrittideah/wongchon/issues/71)
 

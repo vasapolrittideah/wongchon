@@ -65,6 +65,7 @@ Tasks are tracked in the [<name of the Project>](<link to the Project>) GitHub P
 - Write 1 numbered item for each task, in the order of the build. Keep the order the same as the order of the `Blocked by` links of the Issues.
 - Write each item as a link to its Issue, with the Issue number and the Issue title as the link text.
 - If the Project has no number in `.wongchon/config.json`, write the tracking sentence without the Project.
+- For a small change, write the tracking sentence without the milestone, because its Issue has none.
 - If a task has no PR, such as a task that only creates Issues, state it in the tracking sentence.
 
 ### Checkpoints
@@ -105,7 +106,7 @@ Tasks are tracked in the [<name of the Project>](<link to the Project>) GitHub P
 
 ### Links and tracking
 
-- Give each task 1 Issue in the milestone of the change, as the GitHub Issue conventions state.
+- Give each task 1 Issue, as the GitHub Issue conventions state. Put the Issues of a change with a spec in the milestone of the change.
 
 ### Status and approval
 
@@ -125,7 +126,7 @@ Tasks are tracked in the [<name of the Project>](<link to the Project>) GitHub P
 A small change is a change of 1 PR without an intent and a spec, as the [Small change checks](../../ROADMAP.md#decisions) decision of the roadmap states. Its plan and its code are in the same PR.
 
 - Write `None` in the Spec line.
-- Write exactly 1 task, with 1 Issue in its own milestone.
+- Write exactly 1 task, with 1 Issue and no milestone.
 - Do not change `docs/adrs/`, `ARCHITECTURE.md`, or `CONSTRAINTS.md` in the PR. A change of these files needs an intent and a spec.
 
 ## Reference
