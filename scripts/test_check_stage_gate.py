@@ -1,8 +1,10 @@
 import os
+import stat
 import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import check_stage_gate  # noqa: E402
@@ -47,6 +49,96 @@ class Artifacts(unittest.TestCase):
         self.assertEqual(check_stage_gate.check_artifact("docs/intents/a.md", artifact("Approved", 300)), [])
 
 
+def plan(status="Approved", spec="[`docs/specs/x.md`](../specs/x.md)", tasks=1, milestone=False):
+    tracking = "Tasks are tracked in the Project"
+    if milestone:
+        tracking += " under the [x](https://github.com/o/r/milestone/2) milestone"
+    items = ["{0}. [#{0} Add task](https://github.com/o/r/issues/{0})".format(n) for n in range(1, tasks + 1)]
+    return "\n".join(["# Plan: X", "", "Author: Kim Lee", "", "Status: `{0}`".format(status), "",
+                      "Spec: " + spec, "", "## Tasks", "", tracking + ".", ""] + items + [""])
+
+
+def body(*paths):
+    return "## Related artifacts\n\n" + "".join(
+        "- [`{0}`](https://github.com/o/r/blob/main/{0})\n".format(path) for path in paths) + "\n## Related issues\n"
+
+
+class Plans(unittest.TestCase):
+    def setUp(self):
+        self.milestones = []
+
+    def run_check(self, milestone):
+        self.milestones.append(milestone)
+        return ["fails"] if milestone == "bad" else []
+
+    def check(self, path, text):
+        return check_stage_gate.check_artifact(path, text, self.run_check)
+
+    def test_approved_plan_with_a_spec_checks_the_issues_of_its_milestone(self):
+        self.assertEqual(self.check("docs/plans/good.md", plan(milestone=True)), [])
+        self.assertEqual(self.check("docs/plans/bad.md", plan(milestone=True, tasks=3)), ["fails"])
+        self.assertEqual(self.milestones, ["good", "bad"])
+
+    def test_draft_plan_fails_without_a_check_of_issues(self):
+        findings = self.check("docs/plans/good.md", plan(status="Draft"))
+        self.assertIn("has the status", findings[0])
+        self.assertEqual(self.milestones, [])
+
+    def test_small_change_with_1_task_passes_without_a_check_of_issues(self):
+        self.assertEqual(self.check("docs/plans/small.md", plan(spec="None")), [])
+        self.assertEqual(self.milestones, [])
+
+    def test_small_change_with_0_or_2_tasks_or_a_milestone_fails(self):
+        self.assertIn("with 0 tasks", self.check("docs/plans/small.md", plan(spec="None", tasks=0))[0])
+        self.assertIn("with 2 tasks", self.check("docs/plans/small.md", plan(spec="None", tasks=2))[0])
+        self.assertIn("links a milestone", self.check("docs/plans/small.md", plan(spec="None", milestone=True))[0])
+
+    def test_plan_without_a_spec_line_fails(self):
+        text = plan().replace("Spec: [`docs/specs/x.md`](../specs/x.md)\n", "")
+        self.assertEqual(self.check("docs/plans/x.md", text), ["has no Spec line"])
+
+    def run_plan_issues(self, script):
+        with tempfile.TemporaryDirectory() as folder:
+            gh = os.path.join(folder, "gh")
+            with open(gh, "w", encoding="utf-8") as file:
+                file.write("#!{0}\n{1}".format(sys.executable, script))
+            os.chmod(gh, os.stat(gh).st_mode | stat.S_IEXEC)
+            with mock.patch.dict(os.environ, {"PATH": folder + os.pathsep + os.environ["PATH"]}):
+                return check_stage_gate.run_plan_issues("x")
+
+    def test_issue_check_failure_is_a_finding(self):
+        findings = self.run_plan_issues("import sys\nsys.stderr.write('HTTP 401\\n')\nsys.exit(1)\n")
+        self.assertEqual(len(findings), 1)
+        self.assertIn('fails the check of the Issues of the milestone "x"', findings[0])
+        self.assertIn("HTTP 401", findings[0])
+
+    def test_issue_check_pass_gives_no_finding(self):
+        script = ("import json, sys\n"
+                  "if sys.argv[1] == 'issue':\n"
+                  "    print(json.dumps([{'number': 1, 'title': 'Add a', 'body': '## Files\\n\\n- `a.py`'}]))\n"
+                  "else:\n"
+                  "    print('[]')\n")
+        self.assertEqual(self.run_plan_issues(script), [])
+
+
+class DesignLinks(unittest.TestCase):
+    def test_design_file_without_a_spec_link_fails(self):
+        for path in ["docs/adrs/0001-x.md", "ARCHITECTURE.md", "CONSTRAINTS.md"]:
+            with self.subTest(path=path):
+                findings = check_stage_gate.check_design_links([path], body("docs/plans/x.md"))
+                self.assertIn("links no spec", findings[0])
+
+    def test_design_file_with_a_spec_link_passes(self):
+        self.assertEqual(check_stage_gate.check_design_links(["docs/adrs/0001-x.md"], body("docs/specs/x.md")), [])
+
+    def test_spec_link_outside_related_artifacts_does_not_count(self):
+        text = "## Why\n\n- [`docs/specs/x.md`](https://github.com/o/r/blob/main/docs/specs/x.md)\n" + body()
+        self.assertEqual(len(check_stage_gate.check_design_links(["CONSTRAINTS.md"], text)), 1)
+
+    def test_other_files_need_no_spec_link(self):
+        self.assertEqual(check_stage_gate.check_design_links(["docs/conventions/x.md", "docs/adrs.md"], body()), [])
+
+
 class Script(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -72,13 +164,42 @@ class Script(unittest.TestCase):
         self.git("add", "-A")
         self.git("commit", "-q", "-m", message)
 
-    def run_script(self):
+    def run_script(self, **env):
         return subprocess.run([sys.executable, SCRIPT, "main"], cwd=self.temp.name,
-                              stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+                              stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True,
+                              env=dict({k: v for k, v in os.environ.items() if k != "PR_BODY"}, **env))
+
+    def test_changed_draft_plan_fails(self):
+        self.write("docs/plans/new.md", plan(status="Draft"))
+        self.commit("plan")
+        result = self.run_script()
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("docs/plans/new.md has the status", result.stderr)
+
+    def test_design_file_needs_a_spec_link_only_with_a_pr_body(self):
+        self.write("CONSTRAINTS.md", "# Constraints\n")
+        self.commit("constraints")
+        self.assertEqual(self.run_script().returncode, 0)
+        result = self.run_script(PR_BODY=body())
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("CONSTRAINTS.md", result.stderr)
+        self.assertEqual(self.run_script(PR_BODY=body("docs/specs/x.md")).returncode, 0)
+
+    def test_deleted_design_file_needs_a_spec_link(self):
+        self.write("CONSTRAINTS.md", "# Constraints\n")
+        self.git("checkout", "-q", "main")
+        self.commit("constraints")
+        self.git("checkout", "-q", "change")
+        self.git("merge", "-q", "main")
+        self.git("rm", "-q", "CONSTRAINTS.md")
+        self.commit("remove")
+        result = self.run_script(PR_BODY=body())
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("CONSTRAINTS.md", result.stderr)
 
     def test_unchanged_drafts_and_other_files_pass(self):
         self.write("README.md", "Status: `Draft`\n")
-        self.write("docs/plans/a.md", artifact("Draft"))
+        self.write("docs/evidence/a.md", artifact("Draft"))
         self.git("rm", "-q", "docs/specs/gone.md")
         self.commit("change")
         result = self.run_script()

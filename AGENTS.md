@@ -58,7 +58,14 @@ The CI workflow in `.github/workflows/ci.yml` checks the whitespace of the diff,
 
 The workflow in `.github/workflows/protected-checks.yml` runs the `PR metadata`, `Stage gate`, and `Check changes` jobs. It takes the workflow file and the scripts from `main`, so a PR cannot change the result of these jobs.
 
-The stage gate check fails while an intent or a spec that the PR changes is not `Approved`. This failure is expected until the owner approves the artifact, and it does not stop a PR from becoming ready, as the [Status and approval](docs/conventions/pull-requests.md#status-and-approval) rules of the pull request conventions state.
+The stage gate check fails while an intent, a spec, or a plan that the PR changes is not `Approved`. This failure is expected until the owner approves the artifact. It does not stop a PR from becoming ready, as the [Status and approval](docs/conventions/pull-requests.md#status-and-approval) rules of the pull request conventions state.
+
+The stage gate check also fails in these cases:
+
+- An approved plan has 2 Issues in its milestone that change the same file without an order of `Blocked by` links.
+- An Issue of an approved plan has a title of more than 72 characters.
+- The plan of a small change does not have exactly 1 task, or it links a milestone.
+- A PR changes an ADR, `ARCHITECTURE.md`, or `CONSTRAINTS.md`, and it does not link a spec.
 
 No linter runs yet. The hooks are the Git guard of the [Delivery authority](#delivery-authority) section and the review guard of the [Review roles](#review-roles) section. Until the build stage adds more checks, the maintainer checks each PR against the conventions.
 
