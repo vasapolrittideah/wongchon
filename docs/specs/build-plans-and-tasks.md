@@ -2,7 +2,7 @@
 
 Author: Vasapol Rittideah
 
-Status: `Draft`
+Status: `Approved`
 
 Intent: [`docs/intents/build-plans-and-tasks.md`](../intents/build-plans-and-tasks.md)
 
