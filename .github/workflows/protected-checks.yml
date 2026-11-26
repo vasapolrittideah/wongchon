@@ -26,6 +26,9 @@ jobs:
   stage-gate:
     name: Stage gate
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: read
     steps:
       - name: Check out main
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -36,9 +39,12 @@ jobs:
         env:
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: git fetch --no-tags origin "$HEAD_SHA"
-      - name: Check the status of the changed intents and specs
+      - name: Check the changed intents, specs, and plans, and the rules of small changes
         env:
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: python3 scripts/check_stage_gate.py origin/main --head "$HEAD_SHA"
 
   check-changes:
