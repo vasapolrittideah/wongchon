@@ -1,6 +1,6 @@
 # ADR-0030: Track the tasks of a plan as GitHub Issues in a milestone
 
-Status: `Accepted`
+Status: Superseded by [ADR-0038](0038-give-a-milestone-only-to-a-change-with-a-spec.md)
 
 Spec: [`docs/specs/build-plans-and-tasks.md`](../specs/build-plans-and-tasks.md)
 

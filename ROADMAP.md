@@ -85,7 +85,7 @@ Each decision of this project that rejects options is an architecture decision r
 | Role files | Each review role is a role file in `reviewers/` with its model and effort. | [ADR-0027](docs/adrs/0027-keep-review-roles-in-role-files.md) |
 | Review guard | A separate hook blocks a commit or a PR without its stamps. | [ADR-0028](docs/adrs/0028-block-unstamped-commits-in-a-separate-hook.md) |
 | Self-review | The self-review uses `doubt-driven-development` with a `self-reviewer` subagent. | [ADR-0029](docs/adrs/0029-self-review-with-a-self-reviewer-subagent.md) |
-| Plan tasks | Version 1 tracks the tasks of a plan as GitHub Issues in a milestone for each change. | [ADR-0030](docs/adrs/0030-track-tasks-as-github-issues-in-a-milestone.md) |
+| Plan tasks | Version 1 tracks the tasks of a plan as GitHub Issues, with a milestone for each change with a spec. | [ADR-0038](docs/adrs/0038-give-a-milestone-only-to-a-change-with-a-spec.md) |
 | Follow-up tasks | Each follow-up task is an Issue without a milestone, which the agent creates. | [ADR-0031](docs/adrs/0031-make-each-follow-up-task-an-issue-without-a-milestone.md) |
 | Build modes | The `build` skill builds 1 Issue at a time, in single or chain mode. | [ADR-0032](docs/adrs/0032-build-1-issue-at-a-time-in-single-or-chain-mode.md) |
 | Order of plan Issues | A script checks the order of the Issues of a plan in the skills and in the `Stage gate` job. | [ADR-0033](docs/adrs/0033-check-the-order-of-plan-issues-in-skills-and-the-stage-gate.md) |

@@ -13,4 +13,4 @@ This file defines each term that has a narrower or different meaning in the proj
 | single mode | The mode of the `build` skill that builds 1 Issue up to a ready PR, as [ADR-0032](docs/adrs/0032-build-1-issue-at-a-time-in-single-or-chain-mode.md) states. |
 | small change | A change of 1 PR without an intent and a spec, as [ADR-0014](docs/adrs/0014-start-small-changes-at-the-build-stage.md) and [ADR-0034](docs/adrs/0034-detect-a-small-change-from-its-plan-and-its-related-artifacts.md) state. |
 | stage gate | The CI job named `Stage gate`, which fails while a stage artifact of the PR is not `Approved`, as [ADR-0016](docs/adrs/0016-block-unapproved-artifacts-with-a-stage-gate.md) states. |
-| task | 1 unit of work of a plan, which is 1 GitHub Issue and 1 PR, as [ADR-0030](docs/adrs/0030-track-tasks-as-github-issues-in-a-milestone.md) states. |
+| task | 1 unit of work of a plan, which is 1 GitHub Issue and 1 PR, as [ADR-0038](docs/adrs/0038-give-a-milestone-only-to-a-change-with-a-spec.md) states. |
