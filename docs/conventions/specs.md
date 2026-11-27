@@ -23,7 +23,9 @@ Intent: <link to the intent>
 
 ## Requirements
 
-1. Given <state>, when <action>, then <result>. Criterion: <success criterion ID>. Proof: <test level>.
+| ID | Requirement | Criterion | Proof |
+| --- | --- | --- | --- |
+| <requirement ID> | Given <state>, when <action>, then <result>. | <success criterion ID> | <test level> |
 
 ## Design
 
@@ -105,11 +107,14 @@ Intent: <link to the intent>
 
 ### Requirements
 
-- Write each requirement as 1 numbered item in the form Given, when, then, so that a test can prove it.
-- After the result, name the ID of the success criterion of the intent that the requirement serves, such as `S1`. Give each success criterion at least 1 requirement.
-- After the criterion, name the level of the test that proves the requirement, such as unit, integration, end-to-end, or a manual check. The plan of the build stage names each test.
+- Write 1 row for each requirement, in a table with the columns ID, Requirement, Criterion, and Proof.
+- Start each ID with `R` and the number of the requirement in the table, such as `R1`. Issues, plans, and PRs name a requirement by its ID.
+- Write each requirement in the form Given, when, then, so that a test can prove it.
+- In the Criterion column, name the ID of the success criterion of the intent that the requirement serves, such as `S1`. Give each success criterion at least 1 requirement.
+- In the Proof column, name the level of the test that proves the requirement, such as unit, integration, end-to-end, or a manual check. The plan of the build stage names each test.
 - Write a requirement for each behavior that must not change, such as an existing login that keeps working.
 - Do not copy the text of a success criterion. Name its ID.
+- Do not change the ID of a requirement after the spec merges. If a later PR removes a requirement, do not give its ID to another requirement.
 
 ### Design
 
@@ -214,20 +219,22 @@ Intent: <link to the intent>
 
 ### Requirements
 
-These requirements follow the convention. Each one names a success criterion of the intent and a test level, and the last one keeps an existing behavior:
+These requirements follow the convention. Each one has an ID and names a success criterion of the intent and a test level, and the last one keeps an existing behavior:
 
 ```markdown
 ## Requirements
 
-1. Given an account with a confirmed email address, when the user enters a new address, then the service sends a 6-digit code to the new address. Criterion: S1. Proof: integration test.
-2. Given a code that the service sent, when the user enters it within 15 minutes, then the new address replaces the old address. Criterion: S1. Proof: integration test.
-3. Given a pending change of address, when the user signs in with the old address, then the sign-in succeeds. Criterion: S2. Proof: end-to-end test.
+| ID | Requirement | Criterion | Proof |
+| --- | --- | --- | --- |
+| R1 | Given an account with a confirmed email address, when the user enters a new address, then the service sends a 6-digit code to the new address. | S1 | Integration test |
+| R2 | Given a code that the service sent, when the user enters it within 15 minutes, then the new address replaces the old address. | S1 | Integration test |
+| R3 | Given a pending change of address, when the user signs in with the old address, then the sign-in succeeds. | S2 | End-to-end test |
 ```
 
 This requirement does not follow the convention. It copies the text of a success criterion and names no test level, which the [Requirements](#requirements) rules forbid.
 
 ```markdown
-1. A user who changes their email address receives a confirmation code at the new address.
+| R1 | A user who changes their email address receives a confirmation code at the new address. | S1 | |
 ```
 
 ### Boundaries

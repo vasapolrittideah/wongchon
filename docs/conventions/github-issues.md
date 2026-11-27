@@ -19,7 +19,7 @@ An Issue has a [Title](#title), a [Source line](#source-line), a [Result](#resul
 
 ## Requirements
 
-- <requirements of the spec that the task proves, if any>
+<requirements of the spec that the task proves, if any>
 
 ## Files
 
@@ -58,7 +58,8 @@ An Issue has a [Title](#title), a [Source line](#source-line), a [Result](#resul
 
 ### Requirements
 
-- Write 1 bullet that names the numbers of the requirements of the spec and links the spec, such as "Requirements 3 and 4 of the spec". If the task builds a part of the Design with no requirement of its own, name the part.
+- Write 1 sentence that names the IDs of the requirements of the spec and links the spec, such as "R3 and R4 of the spec." For a spec whose requirements have no IDs, name their numbers, such as "Requirements 3 and 4 of the spec."
+- If the task builds a part of the Design with no requirement of its own, name the part.
 - For a small change, write `None`.
 
 ### Files
