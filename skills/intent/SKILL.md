@@ -22,24 +22,29 @@ Do the steps in this order. If the owner must answer a question, stop your turn 
    1. Estimate whether the change fits in 1 PR.
    2. If it fits, tell the owner your estimate and its reason. Propose that the change skips the intent and design stages and starts at the build stage.
    3. Let the owner decide. If the owner chooses to skip the intent, stop this skill.
-2. If the intent depends on outside facts, research them before the interview. Outside facts are, for example, a law, a standard, or the behavior of another system. Also research when the owner asks for it.
+2. Triage the open follow-up Issues of the area of the change, as the [GitHub Issue](../../docs/conventions/github-issues.md) conventions state:
+   1. List the open Issues without a milestone that have the area label of the scope of the change, with `gh issue list --search "no:milestone" --label <area label>`.
+   2. For each Issue, tell the owner its title and its Result, and ask the owner to decide: join the change, wait, or close it with a reason.
+   3. Close each Issue that the owner chose to close, with `gh issue close <number> --reason "not planned" --comment "<reason>"`.
+   4. Keep each Issue that joins the change for the Answers table of the intent and for the plan of the change.
+3. If the intent depends on outside facts, research them before the interview. Outside facts are, for example, a law, a standard, or the behavior of another system. Also research when the owner asks for it.
    1. Give the research to the read-only [`researcher`](../../agents/researcher.md) subagent. Ask it for the answer, its evidence as a URL or a file and line, and the parts that it did not read in full.
    2. Tell the owner in a few sentences what the research found.
    3. Keep each source that the intent uses for the References section of the intent.
-3. Create a short-lived branch from the current default branch, as the branch name conventions state.
-4. Interview the owner with the [`interview-me`](../interview-me/SKILL.md) skill. Follow its steps until the owner confirms the restate with an explicit yes. The skill then writes the intent with the status `Draft`.
-5. If the owner knows the problem but did not choose a direction, ask the owner whether to run the [`idea-refine`](../idea-refine/SKILL.md) skill. Also ask when the interview found 2 or more possible directions. If the owner agrees, run the skill. It writes the chosen direction into the same intent.
-6. Make sure that the intent follows the intent convention. Use the list in [Verification](#verification). Fix each problem before you continue.
-7. Commit the intent, as the commit message conventions state.
-8. Push the branch, and open a draft PR, as the pull request conventions state. In Related artifacts, link the intent.
-9. Mark the PR as ready when it meets each condition of a ready PR. Tell the owner that the PR is ready, and ask them to review the intent.
-10. If the owner asks for changes, edit the intent, commit, and push. Keep the status `Draft`. Then ask for a review again.
-11. If the owner approves the intent in the chat or in a review of the PR, change the status to `Approved`. Commit and push the change. Tell the owner that the PR is ready to merge.
-12. Stop the skill. The owner merges the PR. The design stage starts from the approved intent after the merge.
+4. Create a short-lived branch from the current default branch, as the branch name conventions state.
+5. Interview the owner with the [`interview-me`](../interview-me/SKILL.md) skill. Follow its steps until the owner confirms the restate with an explicit yes. The skill then writes the intent with the status `Draft`.
+6. If the owner knows the problem but did not choose a direction, ask the owner whether to run the [`idea-refine`](../idea-refine/SKILL.md) skill. Also ask when the interview found 2 or more possible directions. If the owner agrees, run the skill. It writes the chosen direction into the same intent.
+7. Make sure that the intent follows the intent convention. Use the list in [Verification](#verification). Fix each problem before you continue.
+8. Commit the intent, as the commit message conventions state.
+9. Push the branch, and open a draft PR, as the pull request conventions state. In Related artifacts, link the intent.
+10. Mark the PR as ready when it meets each condition of a ready PR. Tell the owner that the PR is ready, and ask them to review the intent.
+11. If the owner asks for changes, edit the intent, commit, and push. Keep the status `Draft`. Then ask for a review again.
+12. If the owner approves the intent in the chat or in a review of the PR, change the status to `Approved`. Commit and push the change. Tell the owner that the PR is ready to merge.
+13. Stop the skill. The owner merges the PR. The design stage starts from the approved intent after the merge.
 
 ## Changes to an approved intent
 
-If the goal of a change moves after its intent merged, change the intent in a new PR. Follow steps 3 and 6 to 12. In the new PR, change the status to `Draft` first, as the intent convention states.
+If the goal of a change moves after its intent merged, change the intent in a new PR. Follow steps 4 and 7 to 13. In the new PR, change the status to `Draft` first, as the intent convention states.
 
 ## Rules
 

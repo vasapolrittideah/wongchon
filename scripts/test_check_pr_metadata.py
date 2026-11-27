@@ -151,6 +151,28 @@ class Descriptions(unittest.TestCase):
         body = GOOD_BODY.replace("## Verification\n", "## Verification\n\n```text\n## Related artifacts\nx\n```\n")
         self.assertEqual(self.findings(body), [])
 
+    def follow_ups(self, text):
+        return self.findings(GOOD_BODY.replace("## Follow-up tasks\n\nn/a", "## Follow-up tasks\n\n" + text))
+
+    def test_follow_ups_with_issues_in_order_pass(self):
+        self.assertEqual(self.follow_ups("- #12: Add the check of plan Issues.\n- #30: Copy the test skill.\n"), [])
+
+    def test_follow_up_without_an_issue_or_in_other_form_fails(self):
+        for line in ("- Add the check of plan Issues.", "- #12 Add the check of plan Issues.",
+                     "- #12: Add the check of plan Issues", "- Closes #12: Add the check.", "#12: Add the check."):
+            with self.subTest(line=line):
+                findings = self.follow_ups(line)
+                self.assertEqual(len(findings), 1)
+                self.assertIn("Create a follow-up Issue", findings[0])
+
+    def test_follow_ups_out_of_order_fail(self):
+        findings = self.follow_ups("- #30: Copy the test skill.\n- #12: Add the check of plan Issues.\n")
+        self.assertEqual(findings, ["the Follow-up tasks are not in ascending order of their Issue numbers"])
+
+    def test_follow_ups_heading_in_code_does_not_count(self):
+        body = GOOD_BODY.replace("## Verification\n", "## Verification\n\n```text\n## Follow-up tasks\nx\n```\n")
+        self.assertEqual(self.findings(body), [])
+
     def test_html_comment_in_code_does_not_count(self):
         body = GOOD_BODY.replace("## Why\n", "## Why\n\nThe `<!--` marker starts a comment.\n\n```html\n<!-- x -->\n```\n")
         self.assertEqual(self.findings(body), [])

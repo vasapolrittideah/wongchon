@@ -14,6 +14,7 @@ TYPE_ROW = re.compile(r"^\|\s*`([^`]+)`\s*\|")
 LINK = re.compile(r"\]\(|://")
 FENCE = re.compile(r"^\s*(```|~~~)")
 INLINE_CODE = re.compile(r"`[^`]*`")
+FOLLOW_UP = re.compile(r"^- #(?P<number>\d+): \S.*\.$")
 ARTIFACT = re.compile(r"^- \[`(?P<path>[^`\s]+)`\]\(https://github\.com/[^/\s]+/[^/\s]+/blob/main/(?P=path)\)$")
 
 
@@ -109,10 +110,10 @@ def check_body(body, expected):
             findings.append("the headings are not once each in the order of the template: " + ", ".join(expected))
     if any("<!--" in line for line in lines):
         findings.append("the description has an HTML comment. Delete the comments of the template")
-    return findings + check_related_artifacts(body)
+    return findings + check_follow_ups(body) + check_related_artifacts(body)
 
 
-def check_related_artifacts(body):
+def section_lines(body, heading):
     section = None
     in_block = False
     for line in body.splitlines():
@@ -121,11 +122,33 @@ def check_related_artifacts(body):
         elif not in_block and line.startswith("## "):
             if section is not None:
                 break
-            if line[3:].strip() == "Related artifacts":
+            if line[3:].strip() == heading:
                 section = []
             continue
         if section is not None and line.strip() and not line.startswith("<!--"):
             section.append(line.strip())
+    return section or []
+
+
+def check_follow_ups(body):
+    section = section_lines(body, "Follow-up tasks")
+    if section == ["n/a"]:
+        return []
+    findings, numbers = [], []
+    for line in section:
+        match = FOLLOW_UP.match(line)
+        if not match:
+            findings.append('the Follow-up tasks line "{0}" does not have the form - #<Issue number>: <remaining work>.'
+                            " Create a follow-up Issue for the work".format(line))
+        else:
+            numbers.append(int(match.group("number")))
+    if numbers != sorted(numbers):
+        findings.append("the Follow-up tasks are not in ascending order of their Issue numbers")
+    return findings
+
+
+def check_related_artifacts(body):
+    section = section_lines(body, "Related artifacts")
     if not section or section == ["n/a"]:
         return []
     return ['the Related artifacts line "{0}" does not have the form '

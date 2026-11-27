@@ -30,7 +30,7 @@ n/a
 
 ## Follow-up tasks
 
-<!-- Write 1 bullet for each piece of later work: `- #<Issue number>: <remaining work>.` for work with an open Issue, or `- <remaining work>.` for work without one. -->
+<!-- Create a follow-up Issue for each piece of later work, and write 1 bullet for each: `- #<Issue number>: <remaining work>.` -->
 
 n/a
 

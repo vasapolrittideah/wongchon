@@ -108,14 +108,12 @@ A PR has a title, [Result](#result), [What changed](#what-changed), [Why](#why),
 
 ### Follow-up tasks
 
-- If the work has an open Issue, write `- #<Issue number>: <remaining work>.` If the work has no open Issue, write `- <remaining work>.`, such as `- Add the paths of the stage scopes to .wongchon/config.json.`
+- Write each bullet as `- #<Issue number>: <remaining work>.`, such as `- #42: Add the paths of the stage scopes to the configuration.`
+- Before you write the bullet, create the follow-up Issue of the work, as the [GitHub Issue](github-issues.md) conventions state. Do not ask the maintainer first.
+- Write a bullet only for work that no plan and no Issue holds yet. A step of the next stage, such as the spec after an intent, is not a follow-up task.
 - Write 1 bullet for each piece of work for later, even when there is only 1.
 - Write the remaining work as 1 sentence that names the work. GitHub shows only the number of an Issue, so the sentence must name the work.
-- Put the bullets with an Issue first, in ascending Issue number. Then put the bullets without an Issue.
-- Before you create an Issue for the work, follow these steps:
-  1. Ask the maintainer.
-  2. If the maintainer approves, create the Issue.
-  3. If the maintainer does not approve it, or the session has no chat, write the work without an Issue number.
+- Put the bullets in ascending Issue number.
 - If the PR leaves no work for later, write `n/a`.
 - Do not put `Closes`, `Fixes`, or `Resolves` before the Issue number, because GitHub then closes the Issue when the PR merges.
 
